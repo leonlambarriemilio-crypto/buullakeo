@@ -256,6 +256,17 @@ th:first-child,td:first-child{padding-left:0}
 .comp{white-space:nowrap}
 .comp[aria-pressed="true"]{background:var(--moss-bg);color:var(--moss);border-color:transparent}
 .chip.comp-ok{background:var(--moss-bg);color:var(--moss)}
+.ctl-wide{grid-column:1/-1}
+.ctl textarea{background:var(--night)}
+.checks{display:flex;flex-wrap:wrap;gap:8px 20px}
+.check{display:flex;gap:10px;align-items:center;font-weight:600;min-height:44px;cursor:pointer}
+.check input{width:22px;height:22px;accent-color:var(--pumpkin);margin:0}
+.lbl{font-weight:600;font-size:15px;color:var(--bone)}
+.pg-perfiles{display:flex;flex-direction:column;gap:8px}
+.pg-row{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.5fr) auto;gap:8px;align-items:center}
+@media (max-width:560px){.pg-row{grid-template-columns:minmax(0,1fr) auto}.pg-row .pg-t{grid-column:1/-1;grid-row:2}}
+.sol-state{border:1px solid var(--flame);border-radius:var(--r-m);padding:10px 14px;color:var(--flame);font-weight:600;background:var(--flame-bg)}
+.sol-state a{color:inherit}
 .t-act{white-space:nowrap;text-align:right}
 .t-act .btn+.btn{margin-left:6px}
 
@@ -463,6 +474,7 @@ tr.flash td{animation:flashtd 2.4s ease-out}
       <p class="lede">Lo que mandan desde la página pública cae aquí al instante, en Por aprobar. Si alguien te escribe por DM, pega su mensaje abajo.</p>
     </div>
     <div class="linkbox"><b>Link para invitados</b><code id="lnk"></code><button class="btn sm" type="button" id="b-lnk">Copiar link</button></div>
+    <p class="sol-state" id="sol-state" hidden></p>
     <form class="form paste" id="f-sol" novalidate>
       <div class="field">
         <label for="s-paste">Pega el mensaje del DM</label>
@@ -639,10 +651,36 @@ tr.flash td{animation:flashtd 2.4s ease-out}
         </form>
       </article>
 
+      <article class="ctl ctl-wide" id="ctl-pagina">
+        <h3>Página pública: lo que ven los invitados</h3>
+        <p class="muted">Lo que cambies aquí sale en la página en segundos, sin tocar código.</p>
+        <p class="warnline" id="pg-old" hidden>Para guardar esto falta actualizar el servidor de Google (versión 5). Avísale a Emilio.</p>
+        <form class="form" id="f-pagina" novalidate>
+          <div class="field"><span class="lbl">Solicitudes</span>
+            <div class="checks">
+              <label class="check"><input type="checkbox" id="pg-abierto"> Recibir solicitudes nuevas</label>
+              <label class="check"><input type="checkbox" id="pg-preventa"> Vender preventa</label>
+            </div>
+            <span class="hint">Si apagas la preventa, solo se puede pedir lugar pagando en la puerta.</span>
+          </div>
+          <div class="field" id="pg-msg-f"><label for="pg-msg">Mensaje cuando ya no reciben solicitudes</label><input type="text" id="pg-msg" maxlength="200" placeholder="Ej. Ya se llenó. ¡Nos vemos en la próxima!"></div>
+          <div class="field"><label for="pg-aviso">Aviso arriba de la página <span class="muted">(opcional)</span></label><input type="text" id="pg-aviso" maxlength="200" placeholder="Ej. ¡Quedan 20 preventas!"></div>
+          <div class="field"><span class="lbl">Perfiles de Instagram en "Más información"</span>
+            <div class="pg-perfiles" id="pg-perfiles"></div>
+            <div class="row"><button class="btn sm" type="button" data-act="pg-add" id="pg-add">Agregar perfil</button></div>
+            <span class="hint">El primero es el principal: sale en los boletos y en el mensaje de dudas. Máximo 6.</span>
+          </div>
+          <div class="field"><label for="pg-xfer">Datos para transferir <span class="muted">(opcional)</span></label><textarea id="pg-xfer" maxlength="600" placeholder="Banco, CLABE o número de tarjeta y a nombre de quién"></textarea><span class="hint">Salen en el paso de pago de cada invitado, con botón para copiarlos.</span></div>
+          <div class="field"><label for="pg-incluye">Lo que hay en la fiesta <span class="muted">(uno por renglón)</span></label><textarea id="pg-incluye" maxlength="600"></textarea><span class="hint">Sale en el póster de la página y en los textos para compartir.</span></div>
+          <p class="err" id="pg-err" hidden></p>
+          <div class="row"><button class="btn btn-primary" type="submit" id="pg-save">Guardar página</button><a class="btn ghost" id="pg-ver" href="../" target="_blank" rel="noopener">Ver la página</a></div>
+        </form>
+      </article>
+
       <article class="ctl">
-        <h3>Links de Instagram y Google Maps</h3>
+        <h3>Comprobantes y Google Maps</h3>
         <form class="form" id="f-links" novalidate>
-          <div class="field"><label for="c-ig">Instagram para más información</label><input type="text" id="c-ig" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="@usuario"><span class="hint"><a data-link="ig" href="#" target="_blank" rel="noopener">Abrir perfil</a></span></div>
+          <input type="hidden" id="c-ig">
           <div class="field"><label for="c-igpagos">Instagram que recibe los comprobantes</label><input type="text" id="c-igpagos" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="@usuario"><span class="hint">El botón "Mandar comprobante" de la página abre el chat con esta cuenta. <a data-link="igpagos" href="#" target="_blank" rel="noopener">Abrir perfil</a></span></div>
           <div class="field"><label for="c-mapa">Link de Google Maps</label><input type="text" id="c-mapa" inputmode="url" autocomplete="off" spellcheck="false"><span class="hint">Pega el link de "Compartir" del pin exacto. <a data-link="maps" href="#" target="_blank" rel="noopener">Probar link</a></span></div>
           <p class="hint">Salen en el mensaje de cada boleto y en la página pública.</p>
@@ -808,7 +846,10 @@ tr.flash td{animation:flashtd 2.4s ease-out}
 const TZ = 'America/Mexico_City';
 const EVENT_AT = Date.parse('2026-10-24T19:30:00-06:00');
 const MAPS_URL = 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent('Calle San Pedro 817 Lt. 25');
-const DEFAULTS = { precioPreventa: 70, precioPuerta: 100, meta: null, cupo: null, direccion: 'Calle San Pedro 817 Lt. 25', mapa: MAPS_URL, ig: 'alejandro.elfavoo', igPagos: 'tapiaandrea._' };
+const PAG_DEF = { perfiles: [{ u: 'alejandro.elfavoo', t: 'Dudas, cambios o lo que sea de la fiesta' }], incluye: ['DJ en vivo', 'Rifa de botella al mejor disfraz', 'Venta de alcohol en el lugar'], aviso: '', transferencia: '', cerrado: false, sinPreventa: false, mensajeCerrado: '' };
+const DEFAULTS = { precioPreventa: 70, precioPuerta: 100, meta: null, cupo: null, direccion: 'Calle San Pedro 817 Lt. 25', mapa: MAPS_URL, ig: 'alejandro.elfavoo', igPagos: 'tapiaandrea._', pagina: PAG_DEF };
+const pag = () => Object.assign({}, PAG_DEF, (S.config && S.config.pagina) || {});
+const incluye = () => { const l = (pag().incluye || []).filter(Boolean); return l.length ? l : PAG_DEF.incluye; };
 const igHandle = v => { const s = String(v || '').trim(); const m = s.match(/instagram\.com\/([A-Za-z0-9._]+)/i); return (m ? m[1] : s.replace(/^@/, '')).replace(/[^A-Za-z0-9._]/g, '') || 'alejandro.elfavoo'; };
 const TIPO = { preventa: 'Preventa', asistencia: 'Paga en puerta', cortesia: 'Cortesía', puerta: 'Venta en puerta' };
 const ESTADO = { solicitud: 'Por aprobar', aprobado: 'Aprobada', rechazado: 'Rechazada' };
@@ -893,6 +934,7 @@ function cleanCfg(c) {
   ['precioPreventa', 'precioPuerta'].forEach(k => { o[k] = Number(o[k]) || 0; });
   ['meta', 'cupo'].forEach(k => { o[k] = o[k] === '' || o[k] == null ? null : Number(o[k]) || null; });
   o.ig = igHandle(o.ig); o.mapa = o.mapa || MAPS_URL; o.direccion = o.direccion || DEFAULTS.direccion;
+  if (!o.pagina || typeof o.pagina !== 'object' || Array.isArray(o.pagina)) o.pagina = {};
   return o;
 }
 /* Aplica el paquete que manda el servidor */
@@ -904,6 +946,7 @@ function aplicar(p) {
   if (p.cuentas) { S.cuentas = {}; p.cuentas.forEach(a => { S.cuentas[a.usuario] = { ...a, id: a.usuario }; }); }
   if (p.config) S.config = cleanCfg(p.config);
   if (p.v) S.v = p.v;
+  if (p.version) S.version = p.version;
   S.lastSync = Date.now(); setLive(true);
   fillConfig(); renderWho(); renderAccounts();
   if (p.guests) applyGuests(p.guests); else render();
@@ -1828,10 +1871,67 @@ function fillConfig() {
   $$('[data-link="sheet"]').forEach(a => { a.href = S.hoja || '#'; a.hidden = !isBoss() || !S.hoja; });
   $('#sheet-hint').hidden = !isBoss();
   if (!$('#f-links').contains(document.activeElement)) { $('#c-ig').value = '@' + igh; $('#c-igpagos').value = '@' + igp; $('#c-mapa').value = c.mapa || MAPS_URL; }
+  fillPagina();
   if (f.contains(document.activeElement)) return;
   $('#c-pre').value = c.precioPreventa; $('#c-door').value = c.precioPuerta; $('#c-meta').value = c.meta ?? ''; $('#c-dir').value = c.direccion || ''; $('#c-link').value = c.link || ''; $('#c-cupo').value = c.cupo ?? '';
   if (!$('#f-new').contains(document.activeElement)) setDefaults();
 }
+/* ---------- Página pública (Control) ---------- */
+function perfilRow(u, t) {
+  const d = document.createElement('div'); d.className = 'pg-row';
+  d.innerHTML = '<input type="text" class="pg-u" maxlength="40" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="@usuario" aria-label="Usuario de Instagram">'
+    + '<input type="text" class="pg-t" maxlength="80" autocomplete="off" placeholder="Para qué escribirle (ej. Dudas de la fiesta)" aria-label="Descripción">'
+    + '<button class="btn sm danger" type="button" data-act="pg-del">Quitar</button>';
+  d.querySelector('.pg-u').value = u ? '@' + u : ''; d.querySelector('.pg-t').value = t || '';
+  return d;
+}
+function syncPgUi() {
+  $('#pg-msg-f').hidden = $('#pg-abierto').checked;
+  $('#pg-add').disabled = $$('#pg-perfiles .pg-row').length >= 6;
+}
+function fillPagina(force) {
+  if (!force && $('#f-pagina').contains(document.activeElement)) return;
+  if (!force && S.pgDirty) return;
+  const p = pag();
+  $('#pg-old').hidden = !(S.mode === 'live' && (S.version || 4) < 5);
+  $('#pg-abierto').checked = p.cerrado !== true; $('#pg-preventa').checked = p.sinPreventa !== true;
+  $('#pg-msg').value = p.mensajeCerrado || ''; $('#pg-aviso').value = p.aviso || '';
+  $('#pg-xfer').value = p.transferencia || ''; $('#pg-incluye').value = incluye().join('\n');
+  const box = $('#pg-perfiles'); box.innerHTML = '';
+  const perf = (p.perfiles || []).filter(x => x && x.u);
+  (perf.length ? perf : [{ u: S.config.ig || 'alejandro.elfavoo', t: PAG_DEF.perfiles[0].t }]).forEach(x => box.appendChild(perfilRow(x.u, x.t)));
+  syncPgUi();
+  const st = $('#sol-state');
+  if (st) {
+    const msg = p.cerrado === true ? 'La página no está recibiendo solicitudes nuevas.' : p.sinPreventa === true ? 'La preventa está apagada: solo entran solicitudes de pago en puerta.' : '';
+    st.hidden = !msg; st.innerHTML = msg ? esc(msg) + ' <a href="#control">Cambiar en Control</a>' : '';
+  }
+}
+$('#f-pagina').addEventListener('input', () => { S.pgDirty = true; });
+$('#f-pagina').addEventListener('change', () => { S.pgDirty = true; syncPgUi(); });
+$('#f-pagina').addEventListener('submit', async e => {
+  e.preventDefault();
+  const err = $('#pg-err'); err.hidden = true;
+  const perfiles = [];
+  for (const row of $$('#pg-perfiles .pg-row')) {
+    const ui = row.querySelector('.pg-u'), raw = ui.value.trim(), t = row.querySelector('.pg-t').value.trim();
+    if (!raw && !t) continue;
+    const u = cleanIg(raw);
+    if (!igOk(u)) { err.textContent = `Revisa el usuario "${raw || '(vacío)'}": solo letras, números, puntos y guiones bajos.`; err.hidden = false; ui.focus(); return; }
+    perfiles.push({ u, t });
+  }
+  if (!perfiles.length) { err.textContent = 'Deja al menos un perfil de Instagram.'; err.hidden = false; return; }
+  const pagina = {
+    perfiles, aviso: $('#pg-aviso').value.trim(), transferencia: $('#pg-xfer').value.trim(),
+    incluye: $('#pg-incluye').value.split('\n').map(x => x.trim()).filter(Boolean).slice(0, 8),
+    cerrado: !$('#pg-abierto').checked, sinPreventa: !$('#pg-preventa').checked, mensajeCerrado: $('#pg-msg').value.trim()
+  };
+  if (S.mode === 'live' && (S.version || 4) < 5) { err.textContent = 'Falta actualizar el servidor de Google a la versión 5 para guardar esto.'; err.hidden = false; return; }
+  const btn = $('#pg-save'); btn.disabled = true;
+  const ok = await saveConfig({ pagina, ig: perfiles[0].u });
+  btn.disabled = false;
+  if (ok) { S.pgDirty = false; fillPagina(true); document.activeElement.blur && document.activeElement.blur(); toast('Página guardada. Los invitados ya la ven así.'); }
+});
 function fieldErr(sel, msg) {
   const i = $(sel), e = $(sel + '-err');
   i.setAttribute('aria-invalid', 'true'); if (e) { e.textContent = msg; e.hidden = false; } i.focus();
@@ -2023,7 +2123,7 @@ async function drawTicket(g) {
   ctx.textAlign = 'center';
   const dir = (S.config.direccion || DEFAULTS.direccion).toUpperCase();
   ctx.fillStyle = '#f4ebdf'; fitFont(ctx, dir, 400, 50, ANTON, 760); ctx.fillText(dir, 540, 1690);
-  ctx.fillStyle = '#b5a594'; ctx.font = `500 34px ${BODY}`; ctx.fillText('DJ en vivo   /   Rifa de botella al mejor disfraz', 540, 1742);
+  ctx.fillStyle = '#b5a594'; ctx.font = `500 34px ${BODY}`; { const l = incluye().slice(0, 2).join('   /   '); fitFont(ctx, l, 500, 34, BODY, 900); ctx.fillText(l, 540, 1742); }
   ctx.font = `500 28px ${BODY}`; ctx.fillText('Boleto personal, válido para una entrada', 540, 1840);
 }
 
@@ -2107,14 +2207,15 @@ function drawShare(kind) {
 }
 function shareTexts() {
   const link = shareLink(), pre = money(S.config.precioPreventa), cov = money(S.config.precioPuerta), dir = S.config.direccion || DEFAULTS.direccion;
-  $('#sk-t-post').value = `🎃 BUULLAKEO 🎃\nLa peda casera que estabas esperando.\n\nSábado 24 de octubre · 7:30 p.m.\nDJ en vivo y rifa de botella al mejor disfraz.\nPreventa ${pre} · Cover ${cov}\n\nPide tu lugar aquí 👉 ${link}`;
-  $('#sk-t-wa').value = `¡Ya hay fecha! 🎃 BUULLAKEO, la peda casera que estabas esperando.\n📅 Sábado 24 de octubre, 7:30 p.m.\n📍 ${dir}\n🎧 DJ en vivo y rifa de botella al mejor disfraz\n🎟️ Preventa ${pre} (cover ${cov} en puerta)\n\nPide tu lugar aquí, solo pones tu nombre:\n${link}`;
+  const inc = incluye(), incTxt = inc.length > 1 ? inc.slice(0, -1).join(', ') + ' y ' + inc[inc.length - 1].charAt(0).toLowerCase() + inc[inc.length - 1].slice(1) : inc[0];
+  $('#sk-t-post').value = `🎃 BUULLAKEO 🎃\nLa peda casera que estabas esperando.\n\nSábado 24 de octubre · 7:30 p.m.\n${incTxt}.\nPreventa ${pre} · Cover ${cov}\n\nPide tu lugar aquí 👉 ${link}`;
+  $('#sk-t-wa').value = `¡Ya hay fecha! 🎃 BUULLAKEO, la peda casera que estabas esperando.\n📅 Sábado 24 de octubre, 7:30 p.m.\n📍 ${dir}\n🎧 ${incTxt}\n🎟️ Preventa ${pre} (cover ${cov} en puerta)\n\nPide tu lugar aquí, solo pones tu nombre y tu Instagram:\n${link}`;
   $('#sk-t-bio').value = `🎃 BUULLAKEO · Sáb 24 oct, 7:30 p.m.\nConfirma tu lugar 👇\n${link}`;
 }
 let shareSig = '', shareBusy = false;
 async function renderShare(force) {
   if (!live() || S.tab !== 'control' || shareBusy) return;
-  const sig = [S.config.link, S.config.precioPreventa, S.config.precioPuerta, S.config.direccion].join('|');
+  const sig = [S.config.link, S.config.precioPreventa, S.config.precioPuerta, S.config.direccion, incluye().join('/')].join('|');
   if (!force && sig === shareSig) return;
   shareBusy = true; shareSig = sig;
   shareTexts();
@@ -2391,6 +2492,8 @@ document.addEventListener('click', e => {
   switch (b.dataset.act) {
     case 'checkin': checkin(id); break;
     case 'undo': undoIn(id); break;
+    case 'pg-add': { if ($$('#pg-perfiles .pg-row').length < 6) { const r = perfilRow('', ''); $('#pg-perfiles').appendChild(r); S.pgDirty = true; syncPgUi(); r.querySelector('.pg-u').focus(); } break; }
+    case 'pg-del': { b.closest('.pg-row').remove(); S.pgDirty = true; syncPgUi(); break; }
     case 'comp': {
       const g = byId(id); if (!g || busy.has(id)) break;
       busy.add(id); b.disabled = true;

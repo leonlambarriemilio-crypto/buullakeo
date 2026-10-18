@@ -272,6 +272,16 @@ textarea{width:100%;min-height:136px;margin-top:8px;background:var(--night);bord
 .igb p b{color:var(--flame)}
 .igb p{color:var(--bone)}
 .igb .dots{display:inline-block;padding:0 8px;border-radius:8px;background:var(--smoke-2);letter-spacing:.1em;font-weight:700}
+.aviso{border:2px solid var(--pumpkin);border-radius:18px;background:rgba(255,116,23,.12);padding:14px 16px;font-weight:600;font-size:18px;color:var(--bone);white-space:pre-line;text-align:center}
+.closed{display:flex;flex-direction:column;gap:10px;text-align:center}
+.closed h2{font-family:var(--f-head);font-size:30px;color:var(--flame)}
+.closed p{color:var(--dust);white-space:pre-line}
+.xfer{grid-column:2;margin-top:10px;display:flex;flex-direction:column;gap:8px;border:1px solid var(--line);border-radius:12px;background:var(--night);padding:12px}
+.xfer b{font-size:14px;color:var(--dust);font-weight:600}
+.xfer pre{margin:0;font:600 17px/1.45 var(--f-body);color:var(--bone);white-space:pre-wrap;overflow-wrap:anywhere;user-select:all}
+.xfer .btn-ghost{align-self:flex-start;min-height:42px}
+.opt.off{opacity:.45}
+.opt.off em::after{content:" · agotada";font-size:14px;color:var(--blood)}
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
 </head>
@@ -297,7 +307,7 @@ textarea{width:100%;min-height:136px;margin-top:8px;background:var(--night);bord
       </div>
       <p class="hint" id="hint">Toca la calabaza. <b>Si te atreves.</b></p>
       <div class="facts">
-        <ul><li>DJ en vivo</li><li>Rifa de botella al mejor disfraz</li><li>Venta de alcohol en el lugar</li></ul>
+        <ul id="facts"><li>DJ en vivo</li><li>Rifa de botella al mejor disfraz</li><li>Venta de alcohol en el lugar</li></ul>
         <dl class="prices"><div><dt>Preventa</dt><dd data-price="pre">$70</dd></div><div><dt>Cover</dt><dd data-price="door">$100</dd></div></dl>
       </div>
     </div>
@@ -314,6 +324,8 @@ textarea{width:100%;min-height:136px;margin-top:8px;background:var(--night);bord
       <a class="cal" id="cal" data-cal target="_blank" rel="noopener" href="https://calendar.google.com/calendar/render?action=TEMPLATE&amp;text=BUULLAKEO%20%E2%80%94%20fiesta%20de%20Halloween&amp;dates=20261025T013000Z/20261025T080000Z&amp;location=Calle%20San%20Pedro%20817%20Lt.%2025&amp;details=DJ%20en%20vivo%2C%20rifa%20de%20botella%20al%20mejor%20disfraz.%20Preventa%20%2470%2C%20cover%20%24100.">Agregar a mi calendario</a>
     </div>
   </header>
+
+  <p class="aviso" id="aviso" hidden></p>
 
   <section class="igb" id="igb" hidden aria-live="polite">
     <b>Ábrelo en tu navegador</b>
@@ -367,6 +379,11 @@ textarea{width:100%;min-height:136px;margin-top:8px;background:var(--night);bord
     <p class="note" id="g-note">Tu solicitud llega directo a los organizadores. Aquí mismo verás cuando te aprueben.</p>
   </section>
 
+  <section class="panel closed" id="v-closed" hidden aria-labelledby="c-title">
+    <h2 id="c-title">Ya no estamos recibiendo solicitudes</h2>
+    <p id="c-msg">Gracias por el interés. Si tienes dudas, escríbenos por Instagram.</p>
+  </section>
+
   <section class="panel" id="v-done" hidden aria-labelledby="d-name">
     <div class="slot" aria-hidden="true"></div>
     <article class="stub" id="stub">
@@ -399,6 +416,7 @@ textarea{width:100%;min-height:136px;margin-top:8px;background:var(--night);bord
       <li>
         <h3 id="d-s2-t">Paga tu preventa</h3>
         <p id="d-s2-p"></p>
+        <div class="xfer" id="d-xfer" hidden><b>Datos para transferir</b><pre id="d-xfer-t"></pre><button class="btn-ghost" id="d-xfer-c" type="button">Copiar datos</button></div>
         <p class="pay-ok" id="d-pay-ok" hidden>Ya recibimos tu comprobante. En cuanto confirmemos el pago, tu boleto dice Pagado.</p>
         <div class="pay" id="d-pay" hidden>
           <a class="btn-main" id="d-comp" data-ig-pay-dm href="https://ig.me/m/tapiaandrea._" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><path d="M17.5 6.5h.01"/></svg><span id="d-comp-l">Mandar comprobante por Instagram</span></a>
@@ -426,10 +444,12 @@ textarea{width:100%;min-height:136px;margin-top:8px;background:var(--night);bord
 
   <section class="info" aria-labelledby="i-title">
     <h2 id="i-title">Más información</h2>
-    <a class="info-row" data-ig href="https://www.instagram.com/alejandro.elfavoo/" target="_blank" rel="noopener">
+    <div id="ig-list" style="display:contents">
+    <a class="info-row" href="https://www.instagram.com/alejandro.elfavoo/" target="_blank" rel="noopener">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><path d="M17.5 6.5h.01"/></svg>
-      <span><b data-ig-name>@alejandro.elfavoo</b><small>Dudas, cambios o lo que sea de la fiesta</small></span><i aria-hidden="true">›</i>
+      <span><b>@alejandro.elfavoo</b><small>Dudas, cambios o lo que sea de la fiesta</small></span><i aria-hidden="true">›</i>
     </a>
+    </div>
     <a class="info-row" data-maps href="https://www.google.com/maps/search/?api=1&amp;query=Calle%20San%20Pedro%20817%20Lt.%2025" target="_blank" rel="noopener">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg>
       <span><b data-dir>Calle San Pedro 817 Lt. 25</b><small>Abrir en Google Maps</small></span><i aria-hidden="true">›</i>
@@ -488,6 +508,33 @@ const CFG = Object.assign({
   mapa: 'https://www.google.com/maps/search/?api=1&query=Calle%20San%20Pedro%20817%20Lt.%2025', ig: 'alejandro.elfavoo', igPagos: 'tapiaandrea._', link: '', url: ''
 }, mem.get('buu-cfg') || {});
 const HERE = location.origin + location.pathname.replace(/index\.html$/, '');
+const PAG_DEF = { perfiles: [{ u: 'alejandro.elfavoo', t: 'Dudas, cambios o lo que sea de la fiesta' }], incluye: ['DJ en vivo', 'Rifa de botella al mejor disfraz', 'Venta de alcohol en el lugar'], aviso: '', transferencia: '', cerrado: false, sinPreventa: false, mensajeCerrado: '' };
+let PAG = Object.assign({}, PAG_DEF, (mem.get('buu-cfg') || {}).pagina || {});
+const IG_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><path d="M17.5 6.5h.01"/></svg>';
+const okIg = u => /^[a-z0-9._]{1,30}$/.test(String(u || ''));
+function applyPagina() {
+  const perf = (Array.isArray(PAG.perfiles) ? PAG.perfiles : []).filter(x => x && okIg(x.u));
+  const lista = perf.length ? perf : PAG_DEF.perfiles;
+  CFG.ig = lista[0].u;
+  const box = $('#ig-list'); box.innerHTML = '';
+  lista.forEach(x => {
+    const a = document.createElement('a'); a.className = 'info-row'; a.href = 'https://www.instagram.com/' + x.u + '/'; a.target = '_blank'; a.rel = 'noopener';
+    a.innerHTML = IG_SVG + '<span><b></b><small></small></span><i aria-hidden="true">›</i>';
+    a.querySelector('b').textContent = '@' + x.u; a.querySelector('small').textContent = x.t || 'Instagram';
+    box.appendChild(a);
+  });
+  const inc = (Array.isArray(PAG.incluye) ? PAG.incluye : []).filter(Boolean);
+  const ul = $('#facts'); ul.innerHTML = '';
+  (inc.length ? inc : PAG_DEF.incluye).forEach(t => { const li = document.createElement('li'); li.textContent = t; ul.appendChild(li); });
+  const av = $('#aviso'); av.textContent = PAG.aviso || ''; av.hidden = !PAG.aviso;
+  $('#c-msg').textContent = PAG.mensajeCerrado || 'Gracias por el interés. Si tienes dudas, escríbenos por Instagram.';
+  const sinPre = PAG.sinPreventa === true, pre = $('#g-pre');
+  pre.disabled = sinPre; pre.closest('.opt').classList.toggle('off', sinPre);
+  if (sinPre && pre.checked) $('#g-door').checked = true;
+  if (!$('#v-done').hidden) return;
+  const cerrado = PAG.cerrado === true && !(current && current.editing);
+  $('#v-closed').hidden = !cerrado; $('#v-form').hidden = cerrado;
+}
 const shareURL = () => CFG.link || HERE;
 const money = n => '$' + Math.round(+n || 0).toLocaleString('es-MX');
 const PRICE = { get preventa() { return CFG.precioPreventa; }, get puerta() { return CFG.precioPuerta; } };
@@ -497,6 +544,7 @@ function calURL() {
     '&details=' + encodeURIComponent(`DJ en vivo, rifa de botella al mejor disfraz. Preventa ${money(CFG.precioPreventa)}, cover ${money(CFG.precioPuerta)}.`);
 }
 function applyCfg() {
+  { const p0 = (Array.isArray(PAG.perfiles) ? PAG.perfiles : []).find(x => x && /^[a-z0-9._]{1,30}$/.test(String(x.u || ''))); CFG.ig = p0 ? p0.u : (CFG.ig || 'alejandro.elfavoo'); }
   document.querySelectorAll('[data-price="pre"]').forEach(el => el.textContent = money(CFG.precioPreventa));
   document.querySelectorAll('[data-price="door"]').forEach(el => el.textContent = money(CFG.precioPuerta));
   document.querySelectorAll('[data-dir]').forEach(el => el.textContent = CFG.direccion);
@@ -509,10 +557,13 @@ function applyCfg() {
   document.querySelectorAll('[data-ig-pay-dm]').forEach(el => el.href = 'https://ig.me/m/' + CFG.igPagos);
   const org = $('#org');
   org.href = 'taquilla/'; org.parentElement.hidden = false;
+  applyPagina();
   if (current && !$('#v-done').hidden) showDone(false);
 }
 applyCfg();
-run('configPublica').then(c => { Object.assign(CFG, c); mem.set('buu-cfg', c); applyCfg(); }).catch(() => {});
+function loadCfg() { return run('configPublica').then(c => { Object.assign(CFG, c); PAG = Object.assign({}, PAG_DEF, c.pagina || {}); mem.set('buu-cfg', c); applyCfg(); }).catch(() => {}); }
+loadCfg();
+setInterval(() => { if (!document.hidden) loadCfg(); }, 120000);
 
 /* ---------- cuenta regresiva ---------- */
 const pad = n => String(n).padStart(2, '0');
@@ -604,6 +655,14 @@ async function flushPend(manual) {
       pendDone(p.lid); okN++;
       if (current && current.lid === p.lid) { Object.assign(current, { code: res.codigo, clave: res.clave, estado: res.estado, sent: true }); mem.set('buu-solicitud', current); showDone(false); }
     } catch (e) {
+      if (errCode(e) === 'CERRADO' || errCode(e) === 'PREVENTA_CERRADA') {
+        const cerro = errCode(e) === 'CERRADO';
+        pendDone(p.lid);
+        if (cerro) PAG.cerrado = true; else PAG.sinPreventa = true;
+        if (current && current.lid === p.lid) { mem.del('buu-solicitud'); current = null; $('#v-done').hidden = true; if (cerro) applyPagina(); else showForm(false); }
+        toast(cerro ? 'Ya no estamos recibiendo solicitudes.' : 'La preventa se agotó; pide tu lugar pagando en la puerta.');
+        continue;
+      }
       if (errCode(e) === 'INSTAGRAM') {
         pendDone(p.lid);
         if (current && current.lid === p.lid) { current.instagram = ''; showForm(true); toast('Falta tu usuario de Instagram. Escríbelo y manda otra vez.'); }
@@ -632,6 +691,8 @@ async function submit() {
     const c = errCode(e);
     if (c === 'NOMBRE') fieldErr('#g-nombre', 'Escribe tu nombre para saber quién eres en la puerta.');
     else if (c === 'INSTAGRAM') fieldErr('#g-ig', 'Revisa tu usuario de Instagram: solo letras, números, puntos y guiones bajos.');
+    else if (c === 'CERRADO') { PAG.cerrado = true; applyPagina(); toast('Ya no estamos recibiendo solicitudes.'); }
+    else if (c === 'PREVENTA_CERRADA') { PAG.sinPreventa = true; applyPagina(); toast('La preventa se agotó. Puedes pedir tu lugar pagando en la puerta.'); }
     else if (c === 'CORREO') { $('#more').open = true; fieldErr('#g-correo', 'Revisa el correo o déjalo vacío.'); }
     else if (c.startsWith('LIMITE:')) toast(c.slice(7));
     else { finish({ ...r, sent: false, estado: 'solicitud' }); toast('No hubo conexión. Guardamos tu solicitud y la mandamos sola en cuanto se pueda.'); }
@@ -717,6 +778,8 @@ function showDone(fresh) {
     else $('#d-s2-p').append(`Haz tu transferencia de ${money(PRICE.preventa)} y manda la foto del comprobante a `, Object.assign(document.createElement('span'), { className: 'handle', textContent: '@' + CFG.igPagos }), ' por Instagram. Si no tienes los datos para transferir, pídeselos en ese mismo chat.');
   }
   $('#d-pay').hidden = !(debe && r.sent && r.code);
+  $('#d-xfer').hidden = !(debe && PAG.transferencia); $('#d-xfer-t').textContent = PAG.transferencia || '';
+  if (debe && PAG.transferencia) { $('#d-s2-p').innerHTML = ''; $('#d-s2-p').append(`Transfiere ${money(PRICE.preventa)} con estos datos y manda la foto del comprobante a `, Object.assign(document.createElement('span'), { className: 'handle', textContent: '@' + CFG.igPagos }), ' por Instagram.'); }
   $('#d-pay-ok').hidden = !(debe && r.comprobante);
   $('#d-comp-l').textContent = r.comprobante ? 'Mandar otro comprobante' : 'Mandar comprobante por Instagram';
   $('#d-mine').hidden = !(r.sent && r.code && r.clave && vivo);
@@ -724,12 +787,12 @@ function showDone(fresh) {
   $('#d-s3-p').textContent = ok ? `En la entrada di tu nombre o tu código ${r.boleto || ''}.` : 'Cuando te aprueben, aquí mismo aparece tu boleto con código y QR.';
   $('#d-check').hidden = !(est === 'solicitud' || est === 'local');
   $('#d-edit').hidden = !(est === 'solicitud' || est === 'local');
-  $('#v-form').hidden = true; $('#v-done').hidden = false;
+  $('#v-form').hidden = true; $('#v-closed').hidden = true; $('#v-done').hidden = false;
   if (fresh && !reduced) { stub.classList.remove('in'); void stub.offsetWidth; stub.classList.add('in'); }
   if (fresh) $('#v-done').scrollIntoView({ behavior: reduced ? 'auto' : 'smooth', block: 'start' });
 }
 function showForm(prefill) {
-  $('#v-done').hidden = true; $('#v-form').hidden = false;
+  $('#v-done').hidden = true; $('#v-form').hidden = false; $('#v-closed').hidden = true;
   $('#g-nombre').value = prefill ? current.nombre : '';
   $('#g-ig').value = prefill ? (current.instagram || '') : '';
   $('#g-contacto').value = prefill ? current.contacto : '';
@@ -738,6 +801,7 @@ function showForm(prefill) {
   (prefill && current.tipo === 'puerta' ? $('#g-door') : $('#g-pre')).checked = true;
   $('#more').open = !!(prefill && (current.contacto || current.disfraz || current.correo));
   if (prefill) current.editing = true; else current = null;
+  applyPagina();
   renderPend();
   $('#v-form').scrollIntoView({ behavior: reduced ? 'auto' : 'smooth', block: 'start' });
   setTimeout(() => $('#g-nombre').focus({ preventScroll: true }), 350);
@@ -790,6 +854,11 @@ $('#d-comp').addEventListener('click', () => {
   const txt = `Hola, te mando mi comprobante de BUULLAKEO.\nSolicitud: ${current.code}\nNombre: ${current.nombre}${current.instagram ? '\nInstagram: @' + current.instagram : ''}`;
   if (copiaVieja(txt)) toast('Copiamos tu código. Pégalo junto a la foto del comprobante.');
   else try { navigator.clipboard.writeText(txt).then(() => toast('Copiamos tu código. Pégalo junto a la foto del comprobante.')).catch(() => {}); } catch (e) {}
+});
+$('#d-xfer-c').addEventListener('click', async () => {
+  const t = PAG.transferencia || ''; if (!t) return;
+  if (copiaVieja(t)) { toast('Datos copiados.'); return; }
+  try { await navigator.clipboard.writeText(t); toast('Datos copiados.'); } catch (e) { toast('Mantén presionados los datos para copiarlos.'); }
 });
 $('#d-mine-b').addEventListener('click', async () => {
   if (!current || !current.code || !current.clave) return;
