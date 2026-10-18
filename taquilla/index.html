@@ -1,0 +1,2439 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#17120e">
+<title>Taquilla Buullakeo</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Ctext y=%22.9em%22 font-size=%2290%22%3E%F0%9F%8E%9F%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Barlow+Semi+Condensed:wght@400;500;600;700&family=Creepster&display=swap">
+<style>
+/* Layout: taquilla privada para los organizadores. Header fijo arriba, una columna de trabajo,
+   barra de pestañas abajo en celular (arriba en pantallas anchas). Antes de todo, una puerta
+   con usuario y contraseña. El panel se abre a dos columnas desde 900px. Un solo mundo visual
+   oscuro, tomado del póster. */
+:root{
+  color-scheme: dark;
+  --night:#17120e;      /* fondo: humo de vela */
+  --crypt:#211a15;      /* superficies */
+  --crypt-2:#2c231c;    /* elevado */
+  --ash:#46392f;        /* líneas */
+  --bone:#f4ebdf;       /* texto */
+  --dust:#b5a594;       /* texto secundario */
+  --pumpkin:#ff7a1a;    /* acento: calabaza */
+  --pumpkin-ink:#1a0d04;
+  --flame:#ffc35c;      /* pendiente / por aprobar */
+  --moss:#93d07c;       /* adentro / aprobado */
+  --blood:#ff6a55;      /* rechazar / eliminar */
+  --flame-bg:rgba(255,195,92,.13);
+  --moss-bg:rgba(147,208,124,.14);
+  --blood-bg:rgba(255,106,85,.14);
+  --scrim:rgba(8,5,3,.8);
+  --f-mark:"Creepster","Impact",fantasy;
+  --f-head:"Anton","Impact","Arial Narrow Bold",sans-serif;
+  --f-body:"Barlow Semi Condensed","Arial Narrow",system-ui,sans-serif;
+  --r-s:8px; --r-m:14px;
+}
+html{background:var(--night)}
+body{margin:0}
+img{max-width:100%}
+[hidden]{display:none!important}
+body{background:var(--night);color:var(--bone);font:400 17px/1.45 var(--f-body);-webkit-font-smoothing:antialiased}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:50;background:var(--night)}
+*,*::before,*::after{box-sizing:border-box}
+h1,h2,h3{font-family:var(--f-head);font-weight:400;letter-spacing:.01em;line-height:1.05;margin:0;text-wrap:balance}
+p{margin:0}
+a{color:var(--flame)}
+button,input,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--flame);outline-offset:2px}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.muted{color:var(--dust)}
+.wrap{max-width:1080px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+
+/* Header */
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:30;background:var(--night);border-bottom:1px solid var(--ash)}
+.top-in{display:flex;align-items:center;gap:10px 16px;flex-wrap:wrap;padding-block:10px}
+.mark{font-family:var(--f-mark);font-size:32px;line-height:1;color:var(--bone);text-decoration:none;text-shadow:0 0 18px rgba(255,122,26,.55);letter-spacing:.02em}
+.when{display:flex;flex-direction:column;line-height:1.15;min-width:0}
+.when strong{font-family:var(--f-head);font-weight:400;font-size:18px;color:var(--pumpkin)}
+.when span{font-size:14px;color:var(--dust)}
+.top-tools{margin-left:auto;display:flex;align-items:center;gap:8px}
+.who{display:flex;align-items:center;gap:8px;font-size:15px;line-height:1.1}
+.who small{display:block;color:var(--dust);font-size:13px}
+.pill{display:inline-flex;align-items:center;gap:6px;background:none;border:1px solid var(--ash);border-radius:999px;padding:6px 12px;font-size:14px;font-weight:600;color:var(--dust);cursor:pointer;min-height:34px}
+.pill svg{width:16px;height:16px}
+.pill[aria-pressed="true"]{color:var(--pumpkin);border-color:var(--pumpkin)}
+.pill:hover{border-color:var(--dust)}
+.tabs{display:flex;gap:4px}
+.tabs a{position:relative;display:flex;align-items:center;gap:8px;padding:8px 12px;border-radius:var(--r-s);color:var(--dust);text-decoration:none;font-weight:600;font-size:16px}
+.tabs a svg{width:20px;height:20px;flex:none}
+.tabs a[aria-current="page"]{color:var(--bone);background:var(--crypt-2)}
+.tabs a[aria-current="page"] svg{color:var(--pumpkin)}
+.badge{min-width:20px;height:20px;padding:0 6px;border-radius:999px;background:var(--flame);color:var(--pumpkin-ink);font-size:12px;font-weight:700;display:inline-grid;place-items:center;font-variant-numeric:tabular-nums}
+@media (min-width:760px){ .tabs{order:5;width:100%;border-top:1px solid var(--ash);padding-top:8px} }
+@media (max-width:759px){
+  .tabs{position:fixed;left:0;right:0;bottom:0;z-index:40;background:var(--crypt);border-top:1px solid var(--ash);
+    padding:6px max(6px,env(safe-area-inset-right,0px)) calc(6px + env(safe-area-inset-bottom,0px)) max(6px,env(safe-area-inset-left,0px))}
+  .tabs a{flex:1;flex-direction:column;gap:2px;font-size:12px;padding:6px 2px;min-width:0}
+  .tabs .badge{position:absolute;top:0;left:calc(50% + 6px);min-width:18px;height:18px;font-size:11px}
+  main{padding-bottom:calc(84px + env(safe-area-inset-bottom,0px))}
+  .when span{display:none}
+  .who small,.who-name{display:none}
+}
+
+.banner{background:var(--flame-bg);border-bottom:1px solid rgba(255,195,92,.3);color:var(--flame);font-size:15px}
+.banner .wrap{display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap;padding-block:8px}
+.banner button{background:none;border:1px solid currentColor;color:inherit;border-radius:999px;padding:4px 12px;cursor:pointer;font-size:14px}
+
+main{display:block}
+.view{padding-block:22px 40px;display:flex;flex-direction:column;gap:28px}
+.v-title{font-size:34px}
+.lede{color:var(--dust);max-width:60ch;margin-top:6px}
+
+/* Puerta de acceso */
+.gate{min-height:72vh;display:grid;place-items:center;padding-block:36px}
+.gate-in{width:100%;max-width:420px;text-align:center;display:flex;flex-direction:column;gap:16px;align-items:center}
+.gate-mark{font-family:var(--f-mark);font-size:clamp(56px,15vw,96px);line-height:.95;color:var(--bone);text-shadow:0 0 30px rgba(255,122,26,.6)}
+.gate-date{font-family:var(--f-head);font-size:22px;color:var(--pumpkin)}
+.gate-body{width:100%;display:flex;flex-direction:column;gap:14px;align-items:center}
+.gate-body>p{color:var(--dust);max-width:46ch}
+.gate-body ol{text-align:left;color:var(--dust);margin:0;padding-left:22px;display:flex;flex-direction:column;gap:6px;max-width:46ch}
+.gate-form{width:100%;display:flex;flex-direction:column;gap:14px;text-align:left;background:var(--crypt);border:1px solid var(--ash);border-radius:18px;padding:20px}
+.gate-form h1{font-size:26px}
+.gate-form .btn{width:100%}
+.gate-foot{font-size:14px;color:var(--dust);text-align:center;max-width:40ch}
+.pw{position:relative}
+.pw input{padding-right:84px}
+.pw button{position:absolute;right:6px;top:50%;transform:translateY(-50%);background:none;border:0;color:var(--dust);font-weight:600;font-size:14px;padding:8px;cursor:pointer}
+.pulse{width:10px;height:10px;border-radius:50%;background:var(--pumpkin);box-shadow:0 0 14px var(--pumpkin);animation:pulse 1.2s ease-in-out infinite}
+@keyframes pulse{50%{opacity:.25}}
+
+/* Botones y formularios */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;font-weight:600;font-size:16px;padding:11px 16px;border-radius:var(--r-s);border:1px solid var(--ash);background:var(--crypt-2);color:var(--bone);cursor:pointer;text-decoration:none;min-height:44px}
+.btn:hover{border-color:var(--dust)}
+.btn-primary{background:var(--pumpkin);color:var(--pumpkin-ink);border-color:transparent}
+.btn-primary:hover{background:#ff8f3d;border-color:transparent}
+.btn-ok{background:var(--moss);color:var(--pumpkin-ink);border-color:transparent}
+.btn-ok:hover{background:#a8dd94;border-color:transparent}
+.btn:disabled{opacity:.55;cursor:progress}
+.btn.sm{min-height:36px;padding:6px 12px;font-size:15px}
+.btn.ghost{background:none}
+.btn.danger{color:var(--blood);border-color:rgba(255,106,85,.45);background:none}
+.btn.danger[data-armed="1"]{background:var(--blood);color:var(--pumpkin-ink);border-color:transparent}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+
+.form{display:grid;gap:16px;max-width:560px}
+.field{display:flex;flex-direction:column;gap:6px;min-width:0}
+.field label,.seg legend{font-weight:600;font-size:15px;color:var(--bone)}
+.hint{font-size:14px;color:var(--dust)}
+input[type=text],input[type=search],input[type=email],input[type=number],input[type=password],input[type=tel],textarea,select{
+  width:100%;background:var(--night);border:1px solid var(--ash);border-radius:var(--r-s);padding:12px 14px;font-size:17px;color:var(--bone);min-height:46px}
+.view input[type=text],.view input[type=search],.view input[type=email],.view input[type=number],.view input[type=password],.view textarea,.view select,.sheet input,.sheet select,.sheet textarea{background:var(--crypt)}
+textarea{min-height:76px;resize:vertical}
+input:focus,textarea:focus,select:focus{border-color:var(--pumpkin);outline:none;box-shadow:0 0 0 3px rgba(255,122,26,.22)}
+input[aria-invalid="true"],textarea[aria-invalid="true"]{border-color:var(--blood)}
+.err{color:var(--blood);font-size:14px}
+.warnline{color:var(--flame);font-size:15px;font-weight:600}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media (max-width:480px){.two{grid-template-columns:1fr}}
+.seg{border:0;margin:0;padding:0;display:flex;flex-direction:column;gap:6px;min-width:0}
+.seg-opts{display:flex;flex-wrap:wrap;gap:6px}
+.seg label{position:relative}
+.seg input{position:absolute;opacity:0;inset:0;margin:0;cursor:pointer}
+.seg span{display:inline-flex;align-items:center;min-height:42px;padding:8px 14px;border-radius:999px;border:1px solid var(--ash);color:var(--dust);font-weight:600;background:var(--crypt)}
+.seg input:checked+span{background:var(--pumpkin);border-color:var(--pumpkin);color:var(--pumpkin-ink)}
+.seg input:focus-visible+span{outline:2px solid var(--flame);outline-offset:2px}
+
+/* Chips */
+.chip{display:inline-flex;align-items:center;gap:5px;font-weight:600;font-size:13px;line-height:1.2;padding:3px 9px;border-radius:999px;background:var(--crypt-2);color:var(--dust);white-space:nowrap}
+.chip.warn{background:var(--flame-bg);color:var(--flame)}
+.chip.ok,.chip.in{background:var(--moss-bg);color:var(--moss)}
+.chip.bad{background:var(--blood-bg);color:var(--blood)}
+.chip.in::before,.chip.warn::before{content:"";width:7px;height:7px;border-radius:50%;background:currentColor}
+.code{font-family:var(--f-head);letter-spacing:.06em;color:var(--pumpkin);font-variant-numeric:tabular-nums}
+.code.sol{color:var(--flame)}
+
+/* Panel */
+.hero{display:grid;grid-template-columns:minmax(0,220px) minmax(0,1fr);gap:8px 28px;align-items:center}
+.hero canvas{width:100%;max-width:220px;aspect-ratio:11/10;height:auto;display:block}
+.hero-n{font-size:clamp(64px,13vw,112px);color:var(--bone);display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;font-variant-numeric:tabular-nums}
+.hero-n small{font-family:var(--f-body);font-size:20px;font-weight:600;color:var(--dust);letter-spacing:0}
+.hero-txt{display:flex;flex-direction:column;gap:10px;min-width:0}
+.meter{height:14px;border-radius:999px;background:var(--crypt-2);overflow:hidden;max-width:520px}
+.meter-fill{height:100%;width:0;background:var(--moss);border-radius:999px;transition:width .5s ease}
+.hero-cap{font-size:14px;color:var(--dust)}
+@media (max-width:620px){
+  .hero{grid-template-columns:1fr;justify-items:start}
+  .hero canvas{max-width:170px}
+}
+.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));border-block:1px solid var(--ash)}
+.stat{padding:14px 16px;border-left:1px solid var(--ash);display:flex;flex-direction:column;gap:2px;min-width:0;color:inherit;text-decoration:none}
+.stat:first-child{border-left:0;padding-left:0}
+.stat b{font-family:var(--f-head);font-weight:400;font-size:32px;line-height:1.05;font-variant-numeric:tabular-nums}
+.stat span{font-size:15px;color:var(--dust)}
+a.stat b{color:var(--flame)}
+a.stat:hover span{color:var(--bone)}
+@media (max-width:640px){
+  .stats{grid-template-columns:1fr 1fr}
+  .stat:nth-child(3){border-left:0;padding-left:0}
+  .stat:nth-child(n+3){border-top:1px solid var(--ash)}
+}
+.grid2{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr);gap:28px}
+@media (max-width:900px){.grid2{grid-template-columns:minmax(0,1fr)}}
+.block{display:flex;flex-direction:column;gap:14px;min-width:0}
+.block h2{font-size:24px;display:flex;align-items:center;gap:10px}
+.empty{color:var(--dust);padding:18px;border:1px dashed var(--ash);border-radius:var(--r-m)}
+.chart{position:relative}
+.chart svg{display:block;width:100%;height:auto;overflow:visible}
+.chart .grid{stroke:var(--ash);stroke-width:1}
+.chart .axis{fill:var(--dust);font-size:12px;font-family:var(--f-body)}
+.chart .val{fill:var(--bone);font-size:13px;font-weight:600;font-family:var(--f-body)}
+.chart .bar path{fill:var(--pumpkin)}
+.chart .bar rect{fill:transparent}
+.chart .bar:hover path,.chart .bar:focus path{fill:var(--flame)}
+.chart .bar:focus{outline:none}
+.tip{position:absolute;pointer-events:none;background:var(--bone);color:var(--pumpkin-ink);font-size:14px;font-weight:600;padding:5px 9px;border-radius:6px;white-space:nowrap;transform:translate(-50%,-100%);margin-top:-8px}
+.orgs{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:12px}
+.orgs li{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 12px;align-items:center}
+.orgs .ob{grid-column:1/-1;height:10px;border-radius:0 4px 4px 0;background:var(--pumpkin);min-width:4px}
+.orgs .on{font-weight:600}
+.orgs .oc{font-variant-numeric:tabular-nums;color:var(--dust)}
+.feed{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
+.feed li{display:flex;gap:12px;align-items:baseline;padding:10px 0;border-bottom:1px solid var(--ash)}
+.feed li:last-child{border-bottom:0}
+.feed time{font-variant-numeric:tabular-nums;color:var(--dust);font-size:14px;min-width:92px}
+.feed .fx{min-width:0}
+.feed .fx span{display:block;color:var(--dust);font-size:14px}
+details.block{border-top:1px solid var(--ash);padding-top:14px}
+details.block summary{cursor:pointer;font-family:var(--f-head);font-size:22px;list-style:none;display:flex;align-items:center;gap:10px}
+details.block summary::-webkit-details-marker{display:none}
+details.block summary::before{content:"+";font-family:var(--f-body);font-weight:700;color:var(--pumpkin);width:18px}
+details[open].block summary::before{content:"–"}
+
+/* Solicitudes */
+.linkbox{display:flex;flex-wrap:wrap;align-items:center;gap:8px 14px;background:var(--crypt);border:1px solid var(--ash);border-radius:var(--r-m);padding:12px 14px}
+.linkbox b{font-weight:600}
+.linkbox code{font-size:14px;color:var(--dust);overflow-wrap:anywhere;flex:1 1 220px;min-width:0}
+.paste{background:var(--crypt);border:1px solid var(--ash);border-radius:var(--r-m);padding:16px;max-width:none}
+.paste textarea{min-height:120px;font-size:15px;background:var(--night)}
+.paste input,.paste select{background:var(--night)}
+.parse-msg{font-size:14px;color:var(--moss)}
+.parse-msg.miss{color:var(--dust)}
+
+/* Puerta y tarjetas */
+.door-head{display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.door-count{font-family:var(--f-head);font-size:22px;color:var(--moss);font-variant-numeric:tabular-nums}
+#door-q{font-size:22px;min-height:60px;border-width:2px}
+.dlist{display:flex;flex-direction:column;gap:10px}
+.dcard{display:flex;gap:14px;align-items:center;justify-content:space-between;flex-wrap:wrap;background:var(--crypt);border:1px solid var(--ash);border-radius:var(--r-m);padding:14px 16px}
+.dcard.is-in{border-color:rgba(147,208,124,.4)}
+.dcard.is-pend{border-color:rgba(255,195,92,.35)}
+.dc-main{min-width:0;display:flex;flex-direction:column;gap:6px}
+.dc-name{font-family:var(--f-head);font-size:26px;line-height:1.05;overflow-wrap:anywhere}
+.dc-meta{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.dc-sub{font-size:14px;color:var(--dust)}
+.dc-act{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.dc-in{color:var(--moss);font-weight:600}
+.dcard .btn-primary,.dcard .btn-ok{min-height:52px;font-size:18px;padding-inline:20px}
+
+/* Lista */
+.list-head{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.filters{display:flex;gap:6px;flex-wrap:wrap}
+.filters button{border:1px solid var(--ash);background:none;color:var(--dust);border-radius:999px;padding:6px 12px;font-weight:600;font-size:14px;cursor:pointer;font-variant-numeric:tabular-nums}
+.filters button[aria-pressed="true"]{background:var(--bone);color:var(--pumpkin-ink);border-color:var(--bone)}
+.table-wrap{overflow-x:auto;border-top:1px solid var(--ash)}
+table{width:100%;border-collapse:collapse;min-width:820px}
+th{text-align:left;font-size:13px;font-weight:600;color:var(--dust);padding:10px 10px 8px;border-bottom:1px solid var(--ash)}
+td{padding:10px;border-bottom:1px solid var(--ash);vertical-align:top;font-size:16px}
+th:first-child,td:first-child{padding-left:0}
+.t-name{font-weight:600}
+.t-sub{display:block;color:var(--dust);font-size:14px}
+.iglink{color:var(--flame);font-weight:600;text-decoration:none;overflow-wrap:anywhere}
+.iglink:hover{text-decoration:underline}
+.comp{white-space:nowrap}
+.comp[aria-pressed="true"]{background:var(--moss-bg);color:var(--moss);border-color:transparent}
+.chip.comp-ok{background:var(--moss-bg);color:var(--moss)}
+.t-act{white-space:nowrap;text-align:right}
+.t-act .btn+.btn{margin-left:6px}
+
+/* Cuentas */
+.accts{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
+.accts li{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--ash)}
+.accts li:last-child{border-bottom:0}
+.acct-id{display:flex;flex-direction:column;min-width:0}
+.acct-id b{font-weight:600}
+.acct-id span{color:var(--dust);font-size:14px;overflow-wrap:anywhere}
+.reset{display:flex;gap:8px;flex-wrap:wrap;width:100%}
+.reset input{flex:1 1 200px;min-width:0}
+.sub-h{font-family:var(--f-head);font-size:20px}
+
+/* Modales */
+.modal{position:fixed;inset:0;z-index:70;background:var(--scrim);display:grid;place-items:center;
+  padding:max(16px,env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) max(16px,env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px))}
+.sheet{background:var(--crypt);border:1px solid var(--ash);border-radius:18px;width:min(560px,100%);max-height:100%;overflow:auto;padding:20px;display:flex;flex-direction:column;gap:16px}
+.sheet-head{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.sheet-head h2{font-size:26px;overflow-wrap:anywhere}
+.x{background:none;border:0;color:var(--dust);font-size:28px;line-height:1;cursor:pointer;padding:4px 8px}
+.ticket-img{display:block;width:auto;max-width:100%;max-height:58vh;aspect-ratio:9/16;margin:0 auto;border-radius:12px;background:var(--night)}
+.msg{font-size:15px;min-height:120px}
+
+/* Aviso, sello, murciélagos */
+#toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(96px + env(safe-area-inset-bottom,0px));z-index:80;background:var(--bone);color:var(--pumpkin-ink);font-weight:600;padding:10px 16px;border-radius:10px;max-width:calc(100% - 32px);box-shadow:0 8px 30px rgba(0,0,0,.4)}
+#toast[data-kind="error"]{background:var(--blood)}
+@media (min-width:760px){#toast{bottom:28px}}
+#stamp{position:fixed;inset:0;z-index:75;display:grid;place-items:center;pointer-events:none;background:radial-gradient(circle at center,rgba(255,122,26,.25),rgba(23,18,14,0) 60%)}
+#stamp .s-in{text-align:center;transform:rotate(-6deg);animation:stamp 1.4s cubic-bezier(.2,1.4,.4,1) both}
+#stamp .s-buu{font-family:var(--f-mark);font-size:clamp(90px,28vw,200px);line-height:.9;color:var(--pumpkin);text-shadow:0 0 40px rgba(255,122,26,.7),0 4px 0 var(--pumpkin-ink)}
+#stamp .s-name{font-family:var(--f-head);font-size:clamp(26px,6vw,40px);color:var(--bone);margin-top:6px;overflow-wrap:anywhere;max-width:90vw}
+@keyframes stamp{0%{transform:scale(2.4) rotate(-16deg);opacity:0}18%{transform:scale(1) rotate(-6deg);opacity:1}82%{opacity:1}100%{opacity:0;transform:scale(1) rotate(-6deg)}}
+#bats{position:fixed;inset:0;z-index:74;pointer-events:none;overflow:hidden}
+.bat{position:absolute;left:-90px;color:var(--bone);opacity:.85;animation:fly 2s ease-in forwards}
+.bat svg{display:block;width:100%;height:auto;animation:flap .18s ease-in-out infinite alternate}
+@keyframes fly{to{transform:translate(calc(100vw + 180px),var(--dy))}}
+@keyframes flap{to{transform:scaleY(.45)}}
+#toast[data-kind="live"]{background:var(--moss)}
+
+/* Control */
+.pill.icon{padding:6px 8px}
+.board{background:var(--crypt);border:1px solid var(--ash);border-radius:var(--r-m);padding:18px;display:flex;flex-direction:column;gap:18px}
+.board-head{display:flex;align-items:baseline;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.board-head h3{font-size:26px}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(132px,1fr));gap:10px}
+.kpi{display:flex;flex-direction:column;gap:2px;padding:12px 14px;border-radius:12px;background:var(--night);border:1px solid var(--ash);min-width:0;color:inherit;text-decoration:none}
+.kpi b{font-family:var(--f-head);font-weight:400;font-size:30px;line-height:1.05;font-variant-numeric:tabular-nums}
+.kpi span{font-size:14px;color:var(--dust)}
+.kpi.warn{border-color:rgba(255,195,92,.45)}.kpi.warn b{color:var(--flame)}
+.kpi.ok b{color:var(--moss)}
+.kpi.bad{border-color:rgba(255,106,85,.5)}.kpi.bad b{color:var(--blood)}
+.kpi .bar{height:6px;border-radius:999px;background:var(--crypt-2);overflow:hidden;margin-top:6px}
+.kpi .bar i{display:block;height:100%;background:var(--moss)}
+.table-wrap.slim{border-top:0}
+table.mini{min-width:0}
+table.mini th,table.mini td{padding:8px 10px;font-size:15px}
+table.mini td.n{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+table.mini th.n{text-align:right}
+table.mini tr.tot td{font-weight:700;border-bottom:0}
+.quick{gap:8px}
+.kit{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,200px),1fr));gap:14px;align-items:start}
+.kit-item{margin:0;display:flex;flex-direction:column;gap:10px;min-width:0}
+.kit-item img{display:block;width:100%;height:auto;border-radius:12px;border:1px solid var(--ash);background:var(--night)}
+#sk-story{aspect-ratio:9/16}#sk-post{aspect-ratio:4/5}#sk-qr{aspect-ratio:1}
+.kit-item figcaption{display:flex;flex-direction:column;gap:4px;align-items:flex-start}
+.kit-item figcaption span{font-size:14px;color:var(--dust)}
+.kit-item figcaption .btn{margin-top:4px}
+.texts{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr));gap:14px}
+.texts textarea{min-height:150px;font-size:15px;background:var(--night)}
+.texts .btn{align-self:flex-start}
+.fast{display:inline-flex;align-items:center;gap:6px;font-size:14px;font-weight:600;color:var(--dust);cursor:pointer}
+.fast input{width:18px;height:18px;accent-color:var(--pumpkin)}
+.pill.spin svg{animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.sync-at{font-family:var(--f-body);font-size:14px;font-weight:600;color:var(--dust);letter-spacing:0}
+.ctl-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,420px),1fr));gap:20px;align-items:start}
+.ctl{background:var(--crypt);border:1px solid var(--ash);border-radius:var(--r-m);padding:18px;display:flex;flex-direction:column;gap:14px;min-width:0}
+.ctl h3{font-size:24px}
+.ctl .form{max-width:none}
+.ctl input[type=text],.ctl input[type=email],.ctl input[type=number],.ctl input[type=password],.ctl select{background:var(--night)}
+.danger-zone{border-color:rgba(255,106,85,.5);background:linear-gradient(var(--blood-bg),var(--blood-bg)),var(--crypt)}
+.danger-zone h3{color:var(--blood)}
+.wsteps{list-style:none;margin:0;padding:0;display:flex;gap:10px}
+.wsteps li{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;border:2px solid var(--ash);color:var(--dust);font-weight:700}
+.wsteps li.on{border-color:var(--blood);color:var(--blood)}
+.wsteps li.done{background:var(--blood);border-color:var(--blood);color:var(--pumpkin-ink)}
+.w-q{font-family:var(--f-head);font-size:28px;line-height:1.1}
+.w-progress{height:10px;border-radius:999px;background:var(--crypt-2);overflow:hidden}
+.w-progress i{display:block;height:100%;width:0;background:var(--blood);transition:width .2s}
+
+/* Sello APROBADO */
+#apr{position:fixed;inset:0;z-index:76;display:grid;place-items:center;pointer-events:none}
+#apr .ink{display:flex;flex-direction:column;align-items:center;border:6px double var(--moss);color:var(--moss);border-radius:16px;padding:8px 26px 10px;background:rgba(23,18,14,.72);
+  font-family:var(--f-head);font-size:clamp(54px,15vw,112px);letter-spacing:.08em;text-transform:uppercase;line-height:1;transform:rotate(-12deg);
+  text-shadow:0 0 1px currentColor;box-shadow:0 18px 50px rgba(0,0,0,.5);animation:slam 1.6s cubic-bezier(.2,1.5,.4,1) both}
+#apr .ink small{font-family:var(--f-body);font-weight:700;font-size:20px;letter-spacing:.02em;text-transform:none;max-width:70vw;overflow-wrap:anywhere;text-align:center}
+@keyframes slam{0%{transform:scale(3.2) rotate(-24deg);opacity:0}13%{transform:scale(.96) rotate(-12deg);opacity:1}19%{transform:scale(1.03) rotate(-12deg)}25%{transform:scale(1) rotate(-12deg)}80%{opacity:1}100%{opacity:0;transform:scale(1) rotate(-12deg)}}
+main.thump{animation:thump .3s .18s ease-out}
+@keyframes thump{30%{transform:translateY(4px)}60%{transform:translateY(-2px)}}
+@media (max-width:759px){.tabs a{font-size:11px}}
+@media (prefers-reduced-motion:reduce){#apr .ink,main.thump{animation:none}}
+
+/* En vivo y movimiento */
+.live{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--moss);white-space:nowrap}
+.live::before{content:"";width:8px;height:8px;border-radius:50%;background:currentColor;animation:ping 1.8s ease-out infinite}
+.live.off{color:var(--blood)}
+.live.off::before{animation:none}
+@keyframes ping{0%{box-shadow:0 0 0 0 rgba(147,208,124,.65)}100%{box-shadow:0 0 0 10px rgba(147,208,124,0)}}
+.flash{animation:flash 2.4s ease-out}
+@keyframes flash{0%{background:rgba(255,195,92,.26);border-color:var(--flame)}}
+tr.flash td{animation:flashtd 2.4s ease-out}
+@keyframes flashtd{0%{background:rgba(255,195,92,.18)}}
+.hero-n span.bump{animation:bump .6s cubic-bezier(.2,1.6,.4,1)}
+@keyframes bump{40%{transform:scale(1.12);color:var(--pumpkin)}}
+.hero-n span{display:inline-block;transform-origin:left bottom}
+.gate{position:relative;overflow:hidden}
+.gate-mark{animation:flicker 7s linear infinite}
+@keyframes flicker{0%,17%,21%,61%,64%,100%{opacity:1;text-shadow:0 0 30px rgba(255,122,26,.6)}19%,62.5%{opacity:.45;text-shadow:none}}
+.fog{position:absolute;left:-20%;right:-20%;bottom:-40px;height:220px;pointer-events:none;
+  background:radial-gradient(40% 60% at 25% 70%,rgba(244,235,223,.07),transparent 70%),radial-gradient(35% 55% at 75% 80%,rgba(244,235,223,.06),transparent 70%);
+  animation:drift 18s ease-in-out infinite alternate}
+@keyframes drift{to{transform:translateX(8%)}}
+.dcard,.btn{transition:transform .15s ease,border-color .15s ease,background .15s ease}
+.btn:active{transform:scale(.97)}
+.costumes{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
+.costumes li{display:flex;justify-content:space-between;gap:12px;padding:9px 0;border-bottom:1px solid var(--ash)}
+.costumes li:last-child{border-bottom:0}
+.costumes span{color:var(--flame);font-weight:600;text-align:right;overflow-wrap:anywhere}
+@media (prefers-reduced-motion:reduce){
+  #stamp .s-in{animation:none}
+  .pulse,.live::before,.gate-mark,.fog,.flash,tr.flash td,.hero-n span.bump{animation:none}
+  .meter-fill{transition:none}
+}
+</style>
+</head>
+<body>
+
+<header class="top" id="top">
+  <div class="wrap top-in">
+    <a class="mark" href="#panel" aria-label="Buullakeo, ir al panel">Buullakeo</a>
+    <div class="when"><strong id="countdown">Sábado 24 de octubre</strong><span id="hdr-addr">7:30 p.m., Calle San Pedro 817 Lt. 25</span></div>
+    <div class="top-tools">
+      <a class="pill icon" id="eye" href="#" target="_blank" rel="noopener" title="Ver la página pública" aria-label="Ver la página pública"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg></a>
+      <span class="live" id="live" hidden title="">En vivo</span>
+      <button class="pill icon" id="b-sync" type="button" data-act="sync" aria-label="Actualizar ahora" title="Actualizar ahora" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 11a8 8 0 0 0-14.6-4.5M4 4v4h4M4 13a8 8 0 0 0 14.6 4.5M20 20v-4h-4"/></svg></button>
+      <button class="pill" id="b-sound" type="button" data-act="sound" aria-pressed="false" hidden>Sonido</button>
+      <div class="who" id="who"></div>
+    </div>
+    <nav class="tabs" id="tabs" aria-label="Secciones" hidden>
+      <a href="#panel" data-tab="panel"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>Panel</a>
+      <a href="#solicitudes" data-tab="solicitudes"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a8 8 0 0 1-11.7 7.1L4 20l1-4.7A8 8 0 1 1 21 12z"/><path d="M9 12l2 2 4-4"/></svg>Solicitudes<span class="badge" id="badge" hidden>0</span></a>
+      <a href="#registrar" data-tab="registrar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>Registrar</a>
+      <a href="#puerta" data-tab="puerta"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 21V4a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v17M3 21h18M15 12h.01"/></svg>Puerta</a>
+      <a href="#lista" data-tab="lista"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M9 6h12M9 12h12M9 18h12M4 6h.01M4 12h.01M4 18h.01"/></svg>Lista</a>
+      <a href="#control" data-tab="control"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/></svg>Control</a>
+    </nav>
+  </div>
+</header>
+
+<div class="banner" id="banner" hidden>
+  <div class="wrap"><span>Modo demo con invitados de ejemplo. Nada de esto se guarda en la hoja.</span><button type="button" data-act="exit-demo">Salir del demo</button></div>
+</div>
+
+<main id="app">
+  <section class="gate wrap" id="v-gate">
+    <div class="fog" aria-hidden="true"></div>
+    <div class="gate-in">
+      <p class="gate-mark">Buullakeo</p>
+      <p class="gate-date">Taquilla de organizadores</p>
+      <div class="gate-body" id="gate-body">
+        <span class="pulse" aria-hidden="true"></span>
+        <p>Conectando con la base de invitados…</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- PANEL -->
+  <section class="view wrap" id="v-panel" data-view="panel" hidden>
+    <div class="hero">
+      <canvas id="pumpkin" width="440" height="400" aria-hidden="true"></canvas>
+      <div class="hero-txt">
+        <h1 class="hero-n"><span id="k-pre">0</span><small id="k-pre-l">preventas vendidas</small></h1>
+        <p id="k-meta" class="muted"></p>
+        <div class="meter" role="img" id="meter" aria-label="Personas adentro"><div class="meter-fill" id="m-in"></div></div>
+        <p id="k-in"></p>
+        <p class="hero-cap">La calabaza se enciende conforme entra la gente.</p>
+      </div>
+    </div>
+    <div class="stats" id="stats"></div>
+    <div class="grid2">
+      <article class="block"><h2>Preventas por día</h2><div class="chart" id="chart-days"></div></article>
+      <article class="block"><h2>Quién ha aprobado más</h2><div id="chart-org"></div></article>
+    </div>
+    <div class="grid2">
+      <article class="block"><h2>Últimos movimientos <small class="sync-at" data-sync></small></h2><ol class="feed" id="feed"></ol></article>
+      <article class="block"><h2>Disfraces para la rifa</h2><div id="costumes"></div></article>
+    </div>
+  </section>
+
+  <!-- SOLICITUDES -->
+  <section class="view wrap" id="v-solicitudes" data-view="solicitudes" hidden>
+    <div>
+      <h2 class="v-title">Solicitudes</h2>
+      <p class="lede">Lo que mandan desde la página pública cae aquí al instante, en Por aprobar. Si alguien te escribe por DM, pega su mensaje abajo.</p>
+    </div>
+    <div class="linkbox"><b>Link para invitados</b><code id="lnk"></code><button class="btn sm" type="button" id="b-lnk">Copiar link</button></div>
+    <form class="form paste" id="f-sol" novalidate>
+      <div class="field">
+        <label for="s-paste">Pega el mensaje del DM</label>
+        <textarea id="s-paste" placeholder="Hola, quiero entrar a BUULLAKEO.&#10;Solicitud: SOL-7KXA&#10;Nombre: …&#10;Entrada: Preventa $70"></textarea>
+        <p class="parse-msg miss" id="s-parse">También puedes escribir los datos a mano abajo.</p>
+      </div>
+      <div class="two">
+        <div class="field"><label for="s-nombre">Nombre</label><input type="text" id="s-nombre" autocomplete="off" aria-describedby="s-nombre-err"><p class="err" id="s-nombre-err" hidden></p></div>
+        <div class="field"><label for="s-ig">Instagram</label><input type="text" id="s-ig" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="usuario, sin @" aria-describedby="s-ig-err"><p class="err" id="s-ig-err" hidden></p></div>
+      </div>
+      <div class="two">
+        <div class="field"><label for="s-contacto">Teléfono <span class="muted">(opcional)</span></label><input type="text" id="s-contacto" autocomplete="off"></div>
+        <div class="field"><label for="s-correo">Correo</label><input type="email" id="s-correo" autocomplete="off"></div>
+      </div>
+      <div class="two">
+        <fieldset class="seg"><legend>Entrada</legend>
+          <div class="seg-opts">
+            <label><input type="radio" name="s-tipo" id="s-t-pre" value="preventa" checked><span>Preventa</span></label>
+            <label><input type="radio" name="s-tipo" id="s-t-asi" value="asistencia"><span>Paga en puerta</span></label>
+          </div>
+        </fieldset>
+        <div class="field"><label for="s-disfraz">Disfraz <span class="muted">(para la rifa)</span></label><input type="text" id="s-disfraz" autocomplete="off"></div>
+      </div>
+      <p class="warnline" id="s-dup" hidden></p>
+      <div class="row">
+        <button class="btn btn-primary" type="submit" id="s-save">Agregar a por aprobar</button>
+        <button class="btn" type="button" id="s-now">Aprobar de una vez</button>
+      </div>
+    </form>
+    <article class="block"><h2>Por aprobar <span class="badge" id="pend-n">0</span></h2><div class="dlist" id="pend-list"></div></article>
+    <details class="block" id="rej-box"><summary id="rej-sum">Rechazadas</summary><div class="dlist" id="rej-list"></div></details>
+  </section>
+
+  <!-- REGISTRAR -->
+  <section class="view wrap" id="v-registrar" data-view="registrar" hidden>
+    <div>
+      <h2 class="v-title">Registrar directo</h2>
+      <p class="lede">Para cuando alguien te escribe sin pasar por la página. Lo que registras aquí ya queda aprobado y sale su boleto con código.</p>
+    </div>
+    <form class="form" id="f-new" novalidate>
+      <div class="field">
+        <label for="n-nombre">Nombre</label>
+        <input type="text" id="n-nombre" autocomplete="off" placeholder="Nombre y apellido" aria-describedby="n-nombre-err">
+        <p class="err" id="n-nombre-err" hidden></p>
+      </div>
+      <div class="two">
+        <div class="field"><label for="n-ig">Instagram <span class="muted">(opcional)</span></label><input type="text" id="n-ig" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="usuario, sin @" aria-describedby="n-ig-err"><p class="err" id="n-ig-err" hidden></p></div>
+        <div class="field">
+          <label for="n-correo">Correo <span class="muted">(opcional)</span></label>
+          <input type="email" id="n-correo" autocomplete="off" aria-describedby="n-correo-err">
+          <p class="err" id="n-correo-err" hidden></p>
+        </div>
+      </div>
+      <div class="field"><label for="n-contacto">Teléfono <span class="muted">(opcional)</span></label><input type="text" id="n-contacto" autocomplete="off" placeholder="55 1234 5678"></div>
+      <fieldset class="seg"><legend>Tipo de entrada</legend>
+        <div class="seg-opts">
+          <label><input type="radio" name="n-tipo" id="n-tipo-pre" value="preventa" checked><span>Preventa</span></label>
+          <label><input type="radio" name="n-tipo" id="n-tipo-asi" value="asistencia"><span>Paga en puerta</span></label>
+          <label><input type="radio" name="n-tipo" id="n-tipo-cor" value="cortesia"><span>Cortesía</span></label>
+        </div>
+      </fieldset>
+      <div class="two">
+        <div class="field"><label for="n-monto">Monto</label><input type="number" id="n-monto" min="0" step="1" inputmode="numeric"></div>
+        <fieldset class="seg"><legend>Pago</legend>
+          <div class="seg-opts">
+            <label><input type="radio" name="n-pago" id="n-pago-si" value="pagado" checked><span>Pagado</span></label>
+            <label><input type="radio" name="n-pago" id="n-pago-no" value="pendiente"><span>Pendiente</span></label>
+          </div>
+        </fieldset>
+      </div>
+      <fieldset class="seg"><legend>Cómo pagó</legend>
+        <div class="seg-opts">
+          <label><input type="radio" name="n-metodo" id="n-met-tr" value="transferencia" checked><span>Transferencia</span></label>
+          <label><input type="radio" name="n-metodo" id="n-met-ef" value="efectivo"><span>Efectivo</span></label>
+        </div>
+      </fieldset>
+      <div class="field"><label for="n-disfraz">Disfraz <span class="muted">(opcional, para la rifa)</span></label><input type="text" id="n-disfraz" autocomplete="off"></div>
+      <div class="field"><label for="n-notas">Notas <span class="muted">(opcional)</span></label><textarea id="n-notas" placeholder="Ej. viene con 2 amigos, paga el viernes"></textarea></div>
+      <div class="row"><button class="btn btn-primary" type="submit" id="n-save">Guardar y crear boleto</button></div>
+    </form>
+  </section>
+
+  <!-- PUERTA -->
+  <section class="view wrap" id="v-puerta" data-view="puerta" hidden>
+    <div class="door-head"><h2 class="v-title">Puerta</h2><p class="door-count" id="door-count">0 adentro</p></div>
+    <div class="field">
+      <label for="door-q" class="sr">Buscar invitado por nombre o código</label>
+      <input type="search" id="door-q" placeholder="Nombre, @instagram o código del boleto" autocomplete="off" enterkeyhint="search">
+    </div>
+    <div class="dlist" id="door-results" aria-live="polite"></div>
+    <details class="block" id="door-sale">
+      <summary>Venta en puerta</summary>
+      <form class="form" id="f-door" novalidate>
+        <div class="field"><label for="d-nombre">Nombre <span class="muted">(opcional)</span></label><input type="text" id="d-nombre" autocomplete="off" placeholder="Si no lo dicen, queda como Cover"></div>
+        <div class="two">
+          <div class="field"><label for="d-monto">Cover</label><input type="number" id="d-monto" min="0" step="1" inputmode="numeric"></div>
+          <fieldset class="seg"><legend>Cómo pagó</legend>
+            <div class="seg-opts">
+              <label><input type="radio" name="d-metodo" id="d-met-ef" value="efectivo" checked><span>Efectivo</span></label>
+              <label><input type="radio" name="d-metodo" id="d-met-tr" value="transferencia"><span>Transferencia</span></label>
+            </div>
+          </fieldset>
+        </div>
+        <div class="row"><button class="btn btn-primary" type="submit" id="d-save">Cobrar y dejar pasar</button></div>
+      </form>
+    </details>
+    <article class="block"><h2>Recién entraron</h2><ol class="feed" id="door-recent"></ol></article>
+  </section>
+
+  <!-- LISTA -->
+  <section class="view wrap" id="v-lista" data-view="lista" hidden>
+    <div class="list-head">
+      <h2 class="v-title">Base de invitados</h2>
+      <div class="row">
+        <button class="btn sm btn-primary" type="button" data-act="excel">Descargar Excel</button>
+        <button class="btn sm" type="button" id="b-csv">CSV</button>
+        <button class="btn sm" type="button" id="b-mails">Copiar correos</button>
+      </div>
+    </div>
+    <div class="field"><label for="list-q" class="sr">Buscar en la lista</label><input type="search" id="list-q" placeholder="Buscar por nombre, @instagram, código o correo" autocomplete="off"></div>
+    <div class="filters" id="list-filters" role="group" aria-label="Filtrar lista"></div>
+    <div class="table-wrap"><table id="tbl"><thead><tr><th scope="col">Nombre</th><th scope="col">Código</th><th scope="col">Tipo</th><th scope="col">Estado</th><th scope="col">Pago</th><th scope="col">Entrada</th><th scope="col">Registró</th><th scope="col"><span class="sr">Acciones</span></th></tr></thead><tbody id="tbody"></tbody></table></div>
+  </section>
+  <!-- CONTROL -->
+  <section class="view wrap" id="v-control" data-view="control" hidden>
+    <div>
+      <h2 class="v-title">Control</h2>
+      <p class="lede">Todo el evento de un vistazo, y los ajustes de precios, links, conexión y usuarios.</p>
+    </div>
+    <article class="board" aria-labelledby="bd-title">
+      <div class="board-head"><h3 id="bd-title">Tablero</h3><small class="sync-at" data-sync></small></div>
+      <div class="kpis" id="kpis"></div>
+      <div class="grid2">
+        <div class="block"><h4 class="sub-h">Dinero</h4><div class="table-wrap slim"><table class="mini" id="t-money"></table></div></div>
+        <div class="block"><h4 class="sub-h">Equipo</h4><div class="table-wrap slim"><table class="mini" id="t-team"></table></div></div>
+      </div>
+      <div class="row quick">
+        <button class="btn btn-primary" type="button" data-act="excel">Descargar Excel</button>
+        <button class="btn" type="button" data-act="sync-all">Actualizar todo</button>
+        <button class="btn" type="button" data-act="copy-guest">Copiar link para invitados</button>
+        <a class="btn ghost" data-link="sheet" href="#" target="_blank" rel="noopener">Abrir hoja de solicitudes</a>
+        <a class="btn ghost" data-link="maps" href="#" target="_blank" rel="noopener">Abrir Google Maps</a>
+        <a class="btn ghost" data-link="ig" href="#" target="_blank" rel="noopener">Abrir Instagram</a>
+      </div>
+    </article>
+    <article class="board share-kit" aria-labelledby="sk-title">
+      <div class="board-head"><h3 id="sk-title">Para compartir</h3><small class="muted">Usan el link de la página pública (o tu link corto)</small></div>
+      <div class="kit">
+        <figure class="kit-item"><img id="sk-story" alt="Historia de Instagram de Buullakeo"><figcaption><b>Historia de Instagram</b><span>Pon el sticker de enlace sobre la zona que brilla.</span><button class="btn sm btn-primary" type="button" data-act="share-dl" data-kind="story">Descargar</button></figcaption></figure>
+        <figure class="kit-item"><img id="sk-post" alt="Post de Buullakeo con código QR"><figcaption><b>Post con QR</b><span>Para el feed o para mandar por WhatsApp.</span><button class="btn sm btn-primary" type="button" data-act="share-dl" data-kind="post">Descargar</button></figcaption></figure>
+        <figure class="kit-item"><img id="sk-qr" alt="Código QR para imprimir"><figcaption><b>QR para imprimir</b><span>Para pegarlo en la escuela o en la entrada.</span><button class="btn sm btn-primary" type="button" data-act="share-dl" data-kind="qr">Descargar</button></figcaption></figure>
+      </div>
+      <div class="texts">
+        <div class="field"><label for="sk-t-post">Texto para historia o post</label><textarea id="sk-t-post" readonly></textarea><button class="btn sm" type="button" data-act="share-copy" data-for="sk-t-post">Copiar</button></div>
+        <div class="field"><label for="sk-t-wa">Mensaje para WhatsApp</label><textarea id="sk-t-wa" readonly></textarea><button class="btn sm" type="button" data-act="share-copy" data-for="sk-t-wa">Copiar</button></div>
+        <div class="field"><label for="sk-t-bio">Para la bio de Instagram</label><textarea id="sk-t-bio" readonly></textarea><button class="btn sm" type="button" data-act="share-copy" data-for="sk-t-bio">Copiar</button></div>
+      </div>
+      <canvas id="sk-canvas" hidden></canvas>
+    </article>
+    <div class="ctl-grid">
+      <article class="ctl">
+        <h3>Precios y evento</h3>
+        <form class="form" id="f-config" novalidate>
+          <div class="two">
+            <div class="field"><label for="c-pre">Precio de preventa</label><input type="number" id="c-pre" min="0" step="1" inputmode="numeric"></div>
+            <div class="field"><label for="c-door">Cover en puerta</label><input type="number" id="c-door" min="0" step="1" inputmode="numeric"></div>
+          </div>
+          <div class="field"><label for="c-meta">Meta de preventas</label><input type="number" id="c-meta" min="0" step="1" inputmode="numeric" placeholder="Ej. 150"><span class="hint">Sirve para ver cuánto falta. Déjalo vacío si no hay meta.</span></div>
+          <div class="field"><label for="c-dir">Dirección que sale en el boleto</label><input type="text" id="c-dir"></div>
+          <div class="field"><label for="c-cupo">Cupo máximo <span class="muted">(opcional)</span></label><input type="number" id="c-cupo" min="0" step="1" inputmode="numeric" placeholder="Ej. 120"><span class="hint">Te avisa en el tablero cuando se acerque al lleno.</span></div>
+          <div class="field"><label for="c-link">Link corto para compartir <span class="muted">(opcional)</span></label><input type="text" id="c-link" inputmode="url" autocomplete="off" spellcheck="false" placeholder="Ej. https://bit.ly/buullakeo"><span class="hint">Si haces un link corto que apunte a la página pública, ponlo aquí y lo usan el QR y los textos para compartir.</span></div>
+          <p class="hint">La página pública toma estos precios y la dirección solos.</p>
+          <div class="row"><button class="btn btn-primary" type="submit" id="c-save">Guardar precios y evento</button></div>
+        </form>
+      </article>
+
+      <article class="ctl">
+        <h3>Links de Instagram y Google Maps</h3>
+        <form class="form" id="f-links" novalidate>
+          <div class="field"><label for="c-ig">Instagram para más información</label><input type="text" id="c-ig" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="@usuario"><span class="hint"><a data-link="ig" href="#" target="_blank" rel="noopener">Abrir perfil</a></span></div>
+          <div class="field"><label for="c-igpagos">Instagram que recibe los comprobantes</label><input type="text" id="c-igpagos" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="@usuario"><span class="hint">El botón "Mandar comprobante" de la página abre el chat con esta cuenta. <a data-link="igpagos" href="#" target="_blank" rel="noopener">Abrir perfil</a></span></div>
+          <div class="field"><label for="c-mapa">Link de Google Maps</label><input type="text" id="c-mapa" inputmode="url" autocomplete="off" spellcheck="false"><span class="hint">Pega el link de "Compartir" del pin exacto. <a data-link="maps" href="#" target="_blank" rel="noopener">Probar link</a></span></div>
+          <p class="hint">Salen en el mensaje de cada boleto y en la página pública.</p>
+          <div class="row"><button class="btn btn-primary" type="submit" id="l-save">Guardar links</button></div>
+        </form>
+      </article>
+
+      <article class="ctl">
+        <h3>Página pública</h3>
+        <p class="muted">Es el link que compartes. Las páginas viven en GitHub Pages (abren bien dentro de Instagram) y los datos en tu hoja de Google, que es la base de datos.</p>
+        <div class="linkbox"><code id="lnk-c"></code></div>
+        <div class="row">
+          <button class="btn sm btn-primary" type="button" data-act="copy-guest">Copiar link</button>
+          <a class="btn sm" id="pub-open" href="#" target="_blank" rel="noopener">Abrir la página</a>
+          <a class="btn sm ghost" data-link="sheet" href="#" target="_blank" rel="noopener">Abrir la hoja</a>
+        </div>
+        <p class="hint" id="sheet-hint">La hoja solo la abre Emilio, que es el dueño de la cuenta de Google.</p>
+      </article>
+
+      <article class="ctl">
+        <h3>Usuarios</h3>
+        <p class="muted">Cada organizador entra con su usuario y contraseña. Ya no hace falta cuenta de Claude ni invitación por correo.</p>
+        <ul class="accts" id="acct-list"></ul>
+        <form class="form" id="f-adduser" novalidate hidden>
+          <h4 class="sub-h">Agregar usuario</h4>
+          <div class="two">
+            <div class="field"><label for="au-nombre">Nombre</label><input type="text" id="au-nombre" autocomplete="off"></div>
+            <div class="field"><label for="au-user">Usuario</label><input type="text" id="au-user" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="sin espacios"></div>
+          </div>
+          <div class="two">
+            <div class="field"><label for="au-pass">Contraseña temporal</label><input type="text" id="au-pass" autocomplete="off" placeholder="Mínimo 8 caracteres"></div>
+            <div class="field"><label for="au-rol">Rol</label><select id="au-rol"><option value="organizador">Organizador</option><option value="dueño">Dueño</option></select></div>
+          </div>
+          <p class="err" id="au-err" hidden></p>
+          <p class="hint">Pásale el link de la Taquilla, su usuario y esa contraseña. Al entrar crea la suya.</p>
+          <div class="row"><button class="btn btn-primary" type="submit" id="au-save">Agregar usuario</button></div>
+        </form>
+      </article>
+
+      <article class="ctl">
+        <h3>Mi cuenta</h3>
+        <form class="form" id="f-me" novalidate>
+          <div class="field"><label for="me-correo">Mi correo <span class="muted">(para entrar con correo en vez de usuario)</span></label><input type="email" id="me-correo" autocomplete="email"></div>
+          <div class="two">
+            <div class="field"><label for="me-nueva">Contraseña nueva</label><input type="password" id="me-nueva" autocomplete="new-password" placeholder="Déjalo vacío si no cambia"></div>
+            <div class="field"><label for="me-conf">Repite la contraseña nueva</label><input type="password" id="me-conf" autocomplete="new-password"></div>
+          </div>
+          <div class="field"><label for="me-actual">Contraseña actual</label><input type="password" id="me-actual" autocomplete="current-password"><span class="hint">Solo se pide si cambias la contraseña.</span></div>
+          <p class="err" id="me-err" hidden></p>
+          <div class="row"><button class="btn btn-primary" type="submit" id="me-save">Guardar mi cuenta</button></div>
+        </form>
+      </article>
+
+      <article class="ctl danger-zone" id="ctl-danger" hidden>
+        <h3>Zona de peligro</h3>
+        <p class="muted">Borra todos los invitados, solicitudes, cobros y entradas de la hoja. Las cuentas y los precios se quedan. Solo lo puede hacer un dueño y pide su contraseña.</p>
+        <div class="row"><button class="btn danger" type="button" data-act="wipe">Borrar base de invitados</button></div>
+      </article>
+    </div>
+  </section>
+</main>
+
+<!-- Borrar base -->
+<div class="modal" id="m-wipe" hidden role="dialog" aria-modal="true" aria-labelledby="mw-title">
+  <div class="sheet">
+    <div class="sheet-head"><h2 id="mw-title">Borrar base de invitados</h2><button class="x" type="button" data-act="close" aria-label="Cerrar">×</button></div>
+    <ol class="wsteps" aria-label="Confirmaciones"><li id="ws-1">1</li><li id="ws-2">2</li><li id="ws-3">3</li></ol>
+    <div id="w-body"></div>
+  </div>
+</div>
+
+<!-- Aprobar -->
+<div class="modal" id="m-approve" hidden role="dialog" aria-modal="true" aria-labelledby="ma-title">
+  <div class="sheet">
+    <div class="sheet-head"><h2 id="ma-title">Aprobar</h2><button class="x" type="button" data-act="close" aria-label="Cerrar">×</button></div>
+    <p class="muted" id="ma-sub"></p>
+    <form class="form" id="f-approve" novalidate>
+      <fieldset class="seg"><legend>Entrada</legend>
+        <div class="seg-opts">
+          <label><input type="radio" name="a-tipo" id="a-t-pre" value="preventa"><span>Preventa</span></label>
+          <label><input type="radio" name="a-tipo" id="a-t-asi" value="asistencia"><span>Paga en puerta</span></label>
+          <label><input type="radio" name="a-tipo" id="a-t-cor" value="cortesia"><span>Cortesía</span></label>
+        </div>
+      </fieldset>
+      <div class="two">
+        <div class="field"><label for="a-monto">Monto</label><input type="number" id="a-monto" min="0" step="1" inputmode="numeric"></div>
+        <fieldset class="seg" id="a-pago-f"><legend>¿Ya pagó?</legend>
+          <div class="seg-opts">
+            <label><input type="radio" name="a-pago" id="a-p-si" value="pagado"><span>Ya pagó</span></label>
+            <label><input type="radio" name="a-pago" id="a-p-no" value="pendiente"><span>Todavía no</span></label>
+          </div>
+        </fieldset>
+      </div>
+      <fieldset class="seg" id="a-met-f"><legend>Cómo pagó</legend>
+        <div class="seg-opts">
+          <label><input type="radio" name="a-metodo" id="a-m-tr" value="transferencia" checked><span>Transferencia</span></label>
+          <label><input type="radio" name="a-metodo" id="a-m-ef" value="efectivo"><span>Efectivo</span></label>
+        </div>
+      </fieldset>
+      <p class="hint" id="a-hint"></p>
+      <div class="row"><button class="btn btn-ok" type="submit" id="a-save">Aprobar y crear boleto</button></div>
+    </form>
+  </div>
+</div>
+
+<!-- Boleto -->
+<div class="modal" id="m-ticket" hidden role="dialog" aria-modal="true" aria-labelledby="mt-title">
+  <div class="sheet">
+    <div class="sheet-head"><h2 id="mt-title">Boleto</h2><button class="x" type="button" data-act="close" aria-label="Cerrar">×</button></div>
+    <img class="ticket-img" id="t-img" alt="Boleto del invitado">
+    <canvas id="t-canvas" width="1080" height="1920" hidden></canvas>
+    <p class="hint" id="t-hint" hidden>Si no se descarga, mantén presionada la imagen para guardarla.</p>
+    <div class="row">
+      <button class="btn btn-primary" type="button" id="t-dl">Descargar boleto</button>
+      <button class="btn" type="button" id="t-copy">Copiar mensaje para DM</button>
+    </div>
+    <div class="field"><label for="t-msg">Mensaje para mandar</label><textarea class="msg" id="t-msg" readonly></textarea></div>
+  </div>
+</div>
+
+<!-- Editar -->
+<div class="modal" id="m-edit" hidden role="dialog" aria-modal="true" aria-labelledby="me-title">
+  <div class="sheet">
+    <div class="sheet-head"><h2 id="me-title">Editar invitado</h2><button class="x" type="button" data-act="close" aria-label="Cerrar">×</button></div>
+    <form class="form" id="f-edit" novalidate>
+      <div class="field"><label for="e-nombre">Nombre</label><input type="text" id="e-nombre" autocomplete="off"><p class="err" id="e-nombre-err" hidden></p></div>
+      <div class="two">
+        <div class="field"><label for="e-ig">Instagram</label><input type="text" id="e-ig" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="usuario, sin @" aria-describedby="e-ig-err"><p class="err" id="e-ig-err" hidden></p></div>
+        <div class="field"><label for="e-contacto">Teléfono o contacto</label><input type="text" id="e-contacto" autocomplete="off"></div>
+      </div>
+      <div class="field"><label for="e-correo">Correo</label><input type="email" id="e-correo" autocomplete="off"></div>
+      <label class="check" style="display:flex;gap:10px;align-items:center;font-weight:600"><input type="checkbox" id="e-comp" style="width:22px;height:22px"> Comprobante recibido <span class="muted" id="e-comp-who"></span></label>
+      <div class="two">
+        <div class="field"><label for="e-tipo">Tipo</label><select id="e-tipo"><option value="preventa">Preventa</option><option value="asistencia">Paga en puerta</option><option value="cortesia">Cortesía</option><option value="puerta">Venta en puerta</option></select></div>
+        <div class="field"><label for="e-estado">Estado</label><select id="e-estado"><option value="solicitud">Por aprobar</option><option value="aprobado">Aprobada</option><option value="rechazado">Rechazada</option></select></div>
+      </div>
+      <div class="two">
+        <div class="field"><label for="e-monto">Monto</label><input type="number" id="e-monto" min="0" step="1" inputmode="numeric"></div>
+        <div class="field"><label for="e-pago">Pago</label><select id="e-pago"><option value="pagado">Pagado</option><option value="pendiente">Pendiente</option></select></div>
+      </div>
+      <div class="two">
+        <div class="field"><label for="e-metodo">Cómo pagó</label><select id="e-metodo"><option value="transferencia">Transferencia</option><option value="efectivo">Efectivo</option></select></div>
+        <div class="field"><label for="e-disfraz">Disfraz</label><input type="text" id="e-disfraz" autocomplete="off"></div>
+      </div>
+      <div class="field"><label for="e-notas">Notas</label><textarea id="e-notas"></textarea></div>
+      <div class="row" style="justify-content:space-between">
+        <button class="btn btn-primary" type="submit" id="e-save">Guardar cambios</button>
+        <button class="btn danger" type="button" id="e-del">Eliminar</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div id="toast" role="status" aria-live="polite" hidden></div>
+<div id="apr" hidden aria-hidden="true"><div class="ink"><span>Aprobado</span><small id="apr-name"></small></div></div>
+<div id="stamp" hidden><div class="s-in"><p class="s-buu">¡Buu!</p><p class="s-name" id="stamp-name"></p></div></div>
+<div id="bats" aria-hidden="true"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
+<script>
+(() => {
+'use strict';
+const TZ = 'America/Mexico_City';
+const EVENT_AT = Date.parse('2026-10-24T19:30:00-06:00');
+const MAPS_URL = 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent('Calle San Pedro 817 Lt. 25');
+const DEFAULTS = { precioPreventa: 70, precioPuerta: 100, meta: null, cupo: null, direccion: 'Calle San Pedro 817 Lt. 25', mapa: MAPS_URL, ig: 'alejandro.elfavoo', igPagos: 'tapiaandrea._' };
+const igHandle = v => { const s = String(v || '').trim(); const m = s.match(/instagram\.com\/([A-Za-z0-9._]+)/i); return (m ? m[1] : s.replace(/^@/, '')).replace(/[^A-Za-z0-9._]/g, '') || 'alejandro.elfavoo'; };
+const TIPO = { preventa: 'Preventa', asistencia: 'Paga en puerta', cortesia: 'Cortesía', puerta: 'Venta en puerta' };
+const ESTADO = { solicitud: 'Por aprobar', aprobado: 'Aprobada', rechazado: 'Rechazada' };
+const ALPHA = 'ACDEFHJKMNPRTUVWXY34679';
+const TKEY = 'buu-token';
+const $ = s => document.querySelector(s);
+const $$ = s => [...document.querySelectorAll(s)];
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const money = n => '$' + Math.round(+n || 0).toLocaleString('es-MX');
+const norm = s => String(s || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().trim();
+const uname = s => norm(s).replace(/^@/, '').replace(/[^a-z0-9._-]/g, '');
+const fT = new Intl.DateTimeFormat('es-MX', { timeZone: TZ, hour: '2-digit', minute: '2-digit', hourCycle: 'h23' });
+const fD = new Intl.DateTimeFormat('es-MX', { timeZone: TZ, day: 'numeric', month: 'short' });
+const fK = new Intl.DateTimeFormat('en-CA', { timeZone: TZ, year: 'numeric', month: '2-digit', day: '2-digit' });
+const tm = ms => ms ? fT.format(ms) : '';
+const dm = ms => ms ? fD.format(ms).replace('.', '') : '';
+const dayKey = ms => fK.format(ms);
+const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const est = g => g.estado || 'aprobado';
+const isOk = g => est(g) === 'aprobado';
+const radio = n => (document.querySelector(`input[name="${n}"]:checked`) || {}).value;
+const cleanIg = raw => { let x = String(raw || '').trim(); const m = x.match(/instagram\.com\/([A-Za-z0-9._]+)/i); if (m) x = m[1]; return x.replace(/\s+/g, '').replace(/^@+/, '').toLowerCase(); };
+const igOk = x => /^[a-z0-9._]{1,30}$/.test(x);
+const igLink = h => h ? `<a class="iglink" href="https://instagram.com/${encodeURIComponent(h)}" target="_blank" rel="noopener">@${esc(h)}</a>` : '';
+const compBtn = g => (g.tipo === 'preventa' || g.comprobante) && est(g) !== 'rechazado' ? `<button class="btn sm comp" type="button" data-act="comp" data-id="${esc(g.id)}" aria-pressed="${g.comprobante ? 'true' : 'false'}" title="${g.comprobante ? 'Lo marcó ' + esc(orgName(g.comprobantePor)) + ' ' + tm(g.comprobanteEn) : 'Márcalo cuando veas su comprobante en el DM'}">${g.comprobante ? 'Comprobante ✓' : 'Recibí comprobante'}</button>` : '';
+/* lee el campo de Instagram de un formulario; null si está mal */
+function igField(sel, required) {
+  const v = cleanIg($(sel).value);
+  if (!v) { if (required) { fieldErr(sel, 'Falta el usuario de Instagram.'); return null; } return ''; }
+  if (!igOk(v)) { fieldErr(sel, 'Solo letras, números, puntos y guiones bajos (máx. 30).'); return null; }
+  $(sel).value = v; return v;
+}
+
+const S = { mode: 'loading', reason: '', gateState: '', guests: [], config: { ...DEFAULTS }, cuentas: {}, yo: null, token: '', url: '', hoja: '', v: '',
+  tab: 'panel', filter: 'todos', sound: false, fast: true, resetOpen: null, flash: new Map(), lastSync: 0, wipeStep: 0, removeArmed: null, rejectArmed: null, guestSig: '', guestsReady: false };
+const busy = new Set();
+try { S.sound = localStorage.getItem('buu-sound') === '1'; S.fast = localStorage.getItem('buu-fast') !== '0'; } catch (e) {}
+
+/* ---------- servidor (Google Apps Script) ---------- */
+const API = window.BUU_API || 'https://script.google.com/macros/s/AKfycbz6ul5cZ06qo5KaDOKtFMypzUhFrUQnJtKHbIEjEvT8S2XYGwAC7Yzcnc2QVSH0o5WxTQ/exec';
+async function run(fn, ...args) {
+  const ctl = 'AbortController' in window ? new AbortController() : null;
+  const t = setTimeout(() => ctl && ctl.abort(), 30000);
+  let j;
+  try {
+    const res = await fetch(API, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ fn, args }), redirect: 'follow', cache: 'no-store', signal: ctl ? ctl.signal : undefined });
+    j = await res.json();
+  } catch (e) { throw new Error('RED'); }
+  finally { clearTimeout(t); }
+  if (!j || j.ok !== true) throw new Error((j && j.error) || 'SERVIDOR');
+  return j.r;
+}
+const errCode = e => String((e && e.message) || e || '').replace(/^Error:\s*/, '');
+function errMsg(e) {
+  const c = errCode(e);
+  return ({
+    SESION: 'Tu sesión terminó. Vuelve a entrar.', TEMPORAL: 'Primero crea tu contraseña nueva.',
+    PERMISO: 'Solo un dueño puede hacer eso.', OCUPADO: 'Alguien más está guardando en este momento. Vuelve a intentar.',
+    NO_EXISTE: 'Ese registro ya no existe; alguien lo borró.', RECHAZADO: 'Esa solicitud está rechazada. Regrésala a por aprobar primero.',
+    CORTA: 'La contraseña necesita al menos 8 caracteres.', ACTUAL: 'La contraseña no coincide.',
+    USUARIO: 'El usuario necesita al menos 3 letras o números, sin espacios.', USUARIO_EXISTE: 'Ese usuario ya existe.',
+    CORREO: 'Revisa el correo: le falta la @ o el dominio.', CORREO_USADO: 'Ese correo ya lo usa otra cuenta.',
+    MAPA: 'El link de Google Maps debe empezar con https://', CONFIRMACION: 'Escribe BORRAR para confirmar.',
+    SIN_SERVIDOR: 'Aquí no hay conexión con la base. Abre la Taquilla desde el link de Buullakeo.',
+    INSTAGRAM: 'Revisa el Instagram: solo letras, números, puntos y guiones bajos (máx. 30).',
+    RED: 'Sin conexión con la base. Revisa tu internet y vuelve a intentar.', SERVIDOR: 'La base tuvo un problema. Vuelve a intentar en un momento.',
+    FUNCION: 'Falta actualizar el servidor de Google. Avísale a Emilio.'
+  })[c] || (c.startsWith('LIMITE:') ? c.slice(7) : 'No se pudo guardar por la conexión. Vuelve a intentar.');
+}
+const me = () => (S.yo && S.yo.usuario) || null;
+const myAcc = () => S.yo;
+const isBoss = () => !!(S.yo && S.yo.rol === 'dueño');
+const byId = id => S.guests.find(g => g.id === id);
+const priceFor = tipo => tipo === 'preventa' ? +S.config.precioPreventa : (tipo === 'asistencia' || tipo === 'puerta') ? +S.config.precioPuerta : 0;
+
+function readToken() { try { return localStorage.getItem(TKEY) || sessionStorage.getItem(TKEY) || ''; } catch (e) { return S.token || ''; } }
+function saveToken(t) { S.token = t; try { localStorage.setItem(TKEY, t); } catch (e) { try { sessionStorage.setItem(TKEY, t); } catch (x) {} } }
+function clearToken() { S.token = ''; try { localStorage.removeItem(TKEY); sessionStorage.removeItem(TKEY); } catch (e) {} }
+
+function cleanCfg(c) {
+  const o = { ...DEFAULTS, ...(c || {}) };
+  ['precioPreventa', 'precioPuerta'].forEach(k => { o[k] = Number(o[k]) || 0; });
+  ['meta', 'cupo'].forEach(k => { o[k] = o[k] === '' || o[k] == null ? null : Number(o[k]) || null; });
+  o.ig = igHandle(o.ig); o.mapa = o.mapa || MAPS_URL; o.direccion = o.direccion || DEFAULTS.direccion;
+  return o;
+}
+/* Aplica el paquete que manda el servidor */
+function aplicar(p) {
+  if (!p) return;
+  if (p.yo) S.yo = p.yo;
+  if (p.url) S.url = p.url;
+  if (p.hoja) S.hoja = p.hoja;
+  if (p.cuentas) { S.cuentas = {}; p.cuentas.forEach(a => { S.cuentas[a.usuario] = { ...a, id: a.usuario }; }); }
+  if (p.config) S.config = cleanCfg(p.config);
+  if (p.v) S.v = p.v;
+  S.lastSync = Date.now(); setLive(true);
+  fillConfig(); renderWho(); renderAccounts();
+  if (p.guests) applyGuests(p.guests); else render();
+}
+function applyGuests(list) {
+  const prev = new Map(S.guests.map(g => [g.id, g]));
+  const first = !S.guestsReady;
+  const sig = JSON.stringify(list);
+  if (!first && sig === S.guestSig) { render(); return; }
+  S.guestSig = sig; S.guests = list; S.guestsReady = true;
+  if (!first) notifyChanges(prev);
+  render();
+}
+/* Una acción de organizador: el servidor valida, guarda y regresa todo al día */
+async function api(tipo, d) {
+  if (S.mode === 'demo') { try { const g = demoApi(tipo, d || {}); render(); renderAccounts(); fillConfig(); return { ok: true, g }; } catch (e) { toast(errMsg(e), 'error'); return { ok: false, code: errCode(e) }; } }
+  try {
+    const p = await run('accion', S.token, tipo, d || {});
+    aplicar(p);
+    return { ok: true, g: p.g };
+  } catch (e) {
+    const c = errCode(e);
+    if (c === 'SESION' || c === 'TEMPORAL') lock(errMsg(e)); else toast(errMsg(e), 'error');
+    return { ok: false, code: c };
+  }
+}
+
+/* ---------- en vivo: revisa cambios cada pocos segundos ---------- */
+let pollT = 0, polling = false, fails = 0;
+async function poll(manual) {
+  if (S.mode !== 'live' || polling) return;
+  polling = true;
+  const btn = $('#b-sync'); if (manual && btn) btn.classList.add('spin');
+  try {
+    const p = await run('sync', S.token, manual ? '' : S.v);
+    fails = 0;
+    if (p.igual) { S.lastSync = Date.now(); setLive(true); } else aplicar(p);
+    if (manual) toast('Todo al día.');
+  } catch (e) {
+    const c = errCode(e);
+    if (c === 'SESION' || c === 'TEMPORAL') { polling = false; lock(errMsg(e)); return; }
+    fails++; setLive(false);
+    if (manual) toast('No se pudo actualizar. Revisa tu internet y vuelve a intentar.', 'error');
+  } finally {
+    polling = false; if (btn) btn.classList.remove('spin'); schedule();
+  }
+}
+function schedule() {
+  clearTimeout(pollT);
+  if (S.mode !== 'live') return;
+  const base = document.hidden ? 30000 : S.fast ? 4000 : 8000;
+  pollT = setTimeout(() => poll(false), base * (fails ? Math.min(4, fails + 1) : 1));
+}
+const refreshNow = manual => poll(!!manual);
+document.addEventListener('visibilitychange', () => { if (!document.hidden && S.mode === 'live') poll(false); });
+addEventListener('online', () => { if (S.mode === 'live') poll(false); });
+
+/* ---------- arranque ---------- */
+async function boot() {
+  countdown(); setInterval(countdown, 30000);
+  const t = readToken();
+  if (!t) { gate('login'); return; }
+  S.token = t;
+  try {
+    const p = await run('sync', t, '');
+    aplicar(p); goLive();
+  } catch (e) {
+    const c = errCode(e);
+    if (c === 'TEMPORAL') { gate('newpass'); return; }
+    if (c !== 'SESION') { gate('login', { msg: 'No se pudo conectar. Revisa tu internet y vuelve a entrar.' }); return; }
+    clearToken(); gate('login');
+  }
+}
+function goLive() {
+  S.mode = 'live';
+  enterApp();
+  schedule();
+}
+
+function setLive(on) {
+  const el = $('#live'); if (!el) return;
+  el.classList.toggle('off', !on); el.textContent = on ? 'En vivo' : 'Reconectando…';
+  el.title = S.lastSync ? 'Última actualización ' + tm(S.lastSync) : '';
+  $$('[data-sync]').forEach(x => x.textContent = S.lastSync ? 'Actualizado ' + fT.format(S.lastSync) : '');
+}
+const markFlash = id => S.flash.set(id, Date.now());
+const flashCls = id => (Date.now() - (S.flash.get(id) || 0) < 2400) ? ' flash' : '';
+function notifyChanges(prev) {
+  const msgs = [];
+  S.guests.forEach(g => {
+    const p = prev.get(g.id);
+    if (!p) {
+      markFlash(g.id);
+      if (g.creadoPor !== me()) msgs.push(g.origen === 'web' ? `Nueva solicitud desde la página: ${g.nombre}` : est(g) === 'solicitud' ? `Nueva solicitud de ${g.nombre}, la pasó ${orgName(g.creadoPor)}` : g.tipo === 'puerta' ? `${orgName(g.creadoPor)} cobró un cover en puerta` : `${orgName(g.creadoPor)} registró a ${g.nombre}`);
+      return;
+    }
+    if (est(p) !== est(g)) {
+      markFlash(g.id);
+      if (est(g) === 'aprobado' && g.aprobadoPor !== me()) msgs.push(`${orgName(g.aprobadoPor)} aprobó a ${g.nombre}`);
+      if (est(g) === 'rechazado' && g.rechazadoPor === 'web') msgs.push(`${g.nombre} canceló su solicitud desde la página`);
+      else if (est(g) === 'rechazado' && g.rechazadoPor !== me()) msgs.push(`${orgName(g.rechazadoPor)} rechazó a ${g.nombre}`);
+    } else if (!p.comprobante && g.comprobante) {
+      markFlash(g.id);
+      if (g.comprobantePor !== me()) msgs.push(`${orgName(g.comprobantePor)} vio el comprobante de ${g.nombre}`);
+    } else if (!p.entro && g.entro) {
+      markFlash(g.id);
+      if (g.entroPor !== me()) msgs.push(`${g.nombre} entró, lo pasó ${orgName(g.entroPor)}`);
+    } else if (p.pago !== g.pago || p.tipo !== g.tipo || p.nombre !== g.nombre || p.notas !== g.notas || p.instagram !== g.instagram || p.comprobante !== g.comprobante) markFlash(g.id);
+  });
+  if (msgs.length) { toast(msgs.length === 1 ? msgs[0] : `${msgs[0]} (+${msgs.length - 1} cambios más)`, 'live'); play('notify'); }
+}
+function lock(msg) {
+  const last = me();
+  if (S.token && S.mode === 'live') run('cerrarSesion', S.token).catch(() => {});
+  clearToken(); clearTimeout(pollT); closeModals();
+  S.mode = 'auth'; S.yo = null; S.guests = []; S.guestsReady = false; S.guestSig = ''; S.v = '';
+  gate('login', { msg, user: last });
+}
+
+/* ---------- puerta de acceso ---------- */
+function hideApp() {
+  $('#v-gate').hidden = false; $('#tabs').hidden = true; $('#banner').hidden = true; $('#b-sound').hidden = true; $('#live').hidden = true; $('#b-sync').hidden = true;
+  $$('.view').forEach(v => v.hidden = true);
+  $('#who').innerHTML = '';
+}
+function gate(state, opt) {
+  opt = opt || {};
+  if (state === 'nodb') { S.mode = 'locked'; S.reason = state; }
+  S.gateState = state;
+  hideApp();
+  const body = $('#gate-body');
+  const demoBtn = '<button class="btn" type="button" data-act="demo">Probar con datos de ejemplo</button>';
+  if (state === 'nodb') {
+    body.innerHTML = `<p>Esta copia no está conectada a la base de invitados. Abre la Taquilla desde el link de Buullakeo que termina en <b>?p=taquilla</b>.</p>${demoBtn}`;
+  } else if (state === 'login') {
+    body.innerHTML = `<form class="gate-form" id="f-login" novalidate>
+      <h1>Entrar a la taquilla</h1>
+      <div class="field"><label for="l-user">Usuario o correo</label><input type="text" id="l-user" autocomplete="username" autocapitalize="none" spellcheck="false"></div>
+      <div class="field"><label for="l-pass">Contraseña</label><div class="pw"><input type="password" id="l-pass" autocomplete="current-password"><button type="button" data-act="peek" data-for="l-pass">Mostrar</button></div></div>
+      <p class="err" id="l-err" ${opt.msg ? '' : 'hidden'}></p>
+      <button class="btn btn-primary" type="submit" id="l-go">Entrar</button>
+    </form>
+    <p class="gate-foot">¿Olvidaste tu contraseña? Pídele a Emilio que la restablezca desde Control.</p>`;
+    if (opt.msg) $('#l-err').textContent = opt.msg;
+    if (opt.user) $('#l-user').value = opt.user;
+    setTimeout(() => { const f = opt.user ? $('#l-pass') : $('#l-user'); if (f) f.focus(); }, 30);
+  } else if (state === 'newpass') {
+    body.innerHTML = `<form class="gate-form" id="f-newpass" novalidate>
+      <h1 id="np-title"></h1>
+      <p class="muted">Tu contraseña es temporal. Crea una que solo tú sepas; la vas a usar cada vez que entres.</p>
+      <div class="field"><label for="np-1">Contraseña nueva</label><div class="pw"><input type="password" id="np-1" autocomplete="new-password"><button type="button" data-act="peek" data-for="np-1">Mostrar</button></div><span class="hint">Mínimo 8 caracteres.</span></div>
+      <div class="field"><label for="np-2">Repítela</label><input type="password" id="np-2" autocomplete="new-password"></div>
+      <p class="err" id="np-err" hidden></p>
+      <button class="btn btn-primary" type="submit" id="np-go">Guardar y entrar</button>
+    </form>`;
+    $('#np-title').textContent = `Hola, ${(S.yo && S.yo.nombre) || 'organizador'}`;
+    setTimeout(() => $('#np-1').focus(), 30);
+  } else {
+    body.innerHTML = '<span class="pulse" aria-hidden="true"></span><p>Conectando con la base de invitados…</p>';
+  }
+}
+function gateErr(id, msg) { const e = $(id); if (!e) return; e.textContent = msg; e.hidden = false; }
+
+async function doLogin() {
+  const btn = $('#l-go');
+  const who = $('#l-user').value, pw = $('#l-pass').value;
+  if (!who.trim() || !pw) return gateErr('#l-err', 'Escribe tu usuario y tu contraseña.');
+  btn.disabled = true; btn.textContent = 'Revisando…';
+  try {
+    const r = await run('login', who, pw);
+    S.yo = r.yo;
+    saveToken(r.token);
+    if (r.yo.temporal) { gate('newpass'); return; }
+    const p = await run('sync', r.token, '');
+    aplicar(p); goLive();
+    toast(`Bienvenido, ${r.yo.nombre || r.yo.usuario}.`);
+  } catch (e) {
+    const c = errCode(e);
+    $('#l-pass').value = ''; $('#l-pass').focus();
+    gateErr('#l-err', c === 'BLOQUEO' ? 'Demasiados intentos. Espera 5 minutos y vuelve a intentar.' : c === 'CREDENCIALES' ? 'Ese usuario o esa contraseña no coinciden.' : errMsg(e));
+  } finally { if (btn.isConnected) { btn.disabled = false; btn.textContent = 'Entrar'; } }
+}
+async function doNewPass() {
+  const a = $('#np-1').value, b = $('#np-2').value;
+  if (a.length < 8) return gateErr('#np-err', 'Usa al menos 8 caracteres.');
+  if (a !== b) return gateErr('#np-err', 'Las dos contraseñas no son iguales.');
+  const btn = $('#np-go'); btn.disabled = true;
+  try {
+    const r = await run('cambiarPass', S.token, a);
+    saveToken(r.token); S.yo = r.yo;
+    const p = await run('sync', r.token, '');
+    aplicar(p); goLive();
+    toast('Contraseña guardada.');
+  } catch (e) {
+    const c = errCode(e);
+    if (c === 'SESION') { lock('Tu sesión terminó. Entra otra vez con tu contraseña temporal.'); return; }
+    gateErr('#np-err', errMsg(e));
+  } finally { if (btn.isConnected) btn.disabled = false; }
+}
+
+function enterApp() {
+  $('#v-gate').hidden = true; $('#tabs').hidden = false; $('#b-sound').hidden = false; $('#live').hidden = false; $('#b-sync').hidden = S.mode === 'demo';
+  if (S.mode === 'demo') { $('#live').textContent = 'Demo'; $('#live').classList.remove('off'); }
+  $('#banner').hidden = S.mode !== 'demo';
+  $('#b-sound').setAttribute('aria-pressed', String(S.sound));
+  renderWho(); setDefaults(); fillConfig();
+  setTab(location.hash.slice(1));
+  render(); renderAccounts();
+  startPumpkin();
+}
+
+/* ---------- demo (sin conexión, nada se guarda) ---------- */
+function startDemo() {
+  S.mode = 'demo';
+  S.cuentas = { emilio: { id: 'emilio', usuario: 'emilio', nombre: 'Emilio', rol: 'dueño' }, andrea: { id: 'andrea', usuario: 'andrea', nombre: 'Andrea', rol: 'organizador' }, alejandro: { id: 'alejandro', usuario: 'alejandro', nombre: 'Alejandro', rol: 'organizador', temporal: true } };
+  S.yo = S.cuentas.emilio;
+  S.guests = demoGuests(); S.guestsReady = true; S.config = cleanCfg({ meta: 120 });
+  enterApp();
+}
+function exitDemo() { S.guests = []; S.cuentas = {}; S.yo = null; S.guestsReady = false; gate(S.reason || 'nodb'); }
+function demoApi(tipo, d) {
+  const now = Date.now(), u = me();
+  const take = id => { const g = byId(id); if (!g) throw new Error('NO_EXISTE'); return g; };
+  const code = sol => { const used = new Set(S.guests.map(x => x.codigo)); const f = sol ? 'BUU-' + String(sol).slice(4) : ''; if (f && !used.has(f)) return f; let c; do { c = 'BUU-' + [0, 0, 0, 0].map(() => ALPHA[Math.floor(Math.random() * ALPHA.length)]).join(''); } while (used.has(c)); return c; };
+  const pick = o => { const c = {}; ['nombre', 'instagram', 'contacto', 'correo', 'disfraz', 'notas', 'tipo', 'estado', 'monto', 'pago', 'metodo'].forEach(k => { if (o[k] !== undefined) c[k] = k === 'monto' ? Math.max(0, +o[k] || 0) : o[k]; }); return c; };
+  switch (tipo) {
+    case 'crear': {
+      const sol = d.origen === 'puerta' ? '' : 'SOL-' + [0, 0, 0, 0].map(() => ALPHA[Math.floor(Math.random() * ALPHA.length)]).join('');
+      const g = { id: sol || 'P-' + now.toString(36), solicitud: sol, codigo: '', entro: false, entroEn: null, entroPor: null, creadoEn: now, creadoPor: u, origen: d.origen || 'taquilla', ...pick(d) };
+      if (!g.nombre) g.nombre = 'Cover ' + (S.guests.filter(x => x.tipo === 'puerta').length + 1);
+      if (g.estado === 'aprobado') Object.assign(g, { aprobadoEn: now, aprobadoPor: u, codigo: code(sol) });
+      if (d.entro) Object.assign(g, { entro: true, entroEn: now, entroPor: u });
+      S.guests.push(g); return g;
+    }
+    case 'aprobar': { const g = take(d.id); Object.assign(g, pick(d), { estado: 'aprobado', aprobadoEn: now, aprobadoPor: u }); if (g.tipo === 'cortesia') Object.assign(g, { pago: 'pagado', monto: 0 }); g.codigo = g.codigo || code(g.solicitud); return g; }
+    case 'rechazar': { const g = take(d.id); Object.assign(g, { estado: 'rechazado', rechazadoEn: now, rechazadoPor: u }); return g; }
+    case 'restaurar': { const g = take(d.id); Object.assign(g, { estado: 'solicitud', rechazadoEn: null, rechazadoPor: null }); return g; }
+    case 'checkin': { const g = take(d.id); if (est(g) === 'solicitud') Object.assign(g, { estado: 'aprobado', aprobadoEn: now, aprobadoPor: u, codigo: g.codigo || code(g.solicitud) }); if (g.pago === 'pendiente') Object.assign(g, { pago: 'pagado', metodo: g.tipo === 'asistencia' ? 'efectivo' : g.metodo || 'efectivo' }); Object.assign(g, { entro: true, entroEn: now, entroPor: u }); return g; }
+    case 'deshacer': { const g = take(d.id); Object.assign(g, { entro: false, entroEn: null, entroPor: null }); return g; }
+    case 'comprobante': { const g = take(d.id); const v = d.valor === true; Object.assign(g, { comprobante: v, comprobanteEn: v ? now : null, comprobantePor: v ? u : null }); return g; }
+    case 'editar': { const g = take(d.id); const before = est(g); Object.assign(g, pick(d)); if (est(g) === 'aprobado' && before !== 'aprobado') Object.assign(g, { aprobadoEn: now, aprobadoPor: u, codigo: g.codigo || code(g.solicitud) }); if (est(g) === 'rechazado' && before !== 'rechazado') Object.assign(g, { rechazadoEn: now, rechazadoPor: u }); return g; }
+    case 'eliminar': { take(d.id); S.guests = S.guests.filter(x => x.id !== d.id); return null; }
+    case 'config': { S.config = cleanCfg({ ...S.config, ...d }); return null; }
+    case 'mi_correo': { S.yo.correo = d.correo; return null; }
+    case 'cuenta_agregar': { const k = uname(d.usuario); if (S.cuentas[k]) throw new Error('USUARIO_EXISTE'); S.cuentas[k] = { id: k, usuario: k, nombre: d.nombre || k, rol: d.rol, temporal: true }; return null; }
+    case 'cuenta_quitar': { delete S.cuentas[d.usuario]; return null; }
+    case 'cuenta_reset': { if (S.cuentas[d.usuario]) S.cuentas[d.usuario].temporal = true; return null; }
+    case 'borrar_base': { if (String(d.confirmacion).toUpperCase() !== 'BORRAR') throw new Error('CONFIRMACION'); S.guests = []; return null; }
+  }
+  return null;
+}
+
+function demoGuests() {
+  const names = ['Mariana López', 'Diego Torres', 'Valeria Cruz', 'Santiago Ruiz', 'Fernanda Gil', 'Iker Morales', 'Regina Paz', 'Emiliano Vega', 'Camila Ortiz', 'Bruno Salas', 'Ximena Luna', 'Rodrigo Ibarra', 'Daniela Soto', 'Pablo Nieto', 'Renata Mena', 'Luis Ángel Ríos', 'Sofía Rangel', 'Mateo Cano', 'Paula Ríos', 'Joaquín Lara', 'Ana Paula Cid', 'Gael Moreno'];
+  const orgs = ['emilio', 'andrea', 'alejandro'];
+  let seed = 11; const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+  const code = () => [0, 0, 0, 0].map(() => ALPHA[Math.floor(rnd() * ALPHA.length)]).join('');
+  const base = Date.parse('2026-10-09T11:00:00-06:00');
+  return names.map((n, i) => {
+    const tipo = i === 5 || i === 14 ? 'cortesia' : i >= names.length - 2 ? 'puerta' : (i % 5 === 3 ? 'asistencia' : 'preventa');
+    const estado = i === 7 || i === 16 || i === 18 ? 'solicitud' : i === 12 ? 'rechazado' : 'aprobado';
+    const pend = (tipo === 'preventa' && i % 6 === 2) || tipo === 'asistencia' || estado === 'solicitud';
+    const entro = estado === 'aprobado' && (tipo === 'puerta' || (i % 3 === 0 && !pend));
+    const handle = norm(n).replace(/[^a-z ]/g, '').replace(/\s+/g, '.');
+    const k = code(), creado = tipo === 'puerta' ? Date.parse('2026-10-24T20:30:00-06:00') + i * 60000 : base + Math.floor(rnd() * 7.3 * 864e5);
+    return {
+      id: 'demo' + i, nombre: n, instagram: handle.slice(0, 30), contacto: i % 3 === 0 ? '55 1234 56' + String(10 + i) : '', correo: i % 4 === 0 ? handle + '@ejemplo.com' : '',
+      comprobante: tipo === 'preventa' && (estado === 'solicitud' || i % 4 === 1), comprobanteEn: base + i * 36e5, comprobantePor: orgs[i % 3],
+      tipo, monto: tipo === 'preventa' ? 70 : (tipo === 'puerta' || tipo === 'asistencia') ? 100 : 0, pago: pend ? 'pendiente' : 'pagado',
+      metodo: i % 2 ? 'transferencia' : 'efectivo', solicitud: tipo === 'puerta' ? '' : 'SOL-' + k, codigo: estado === 'aprobado' ? 'BUU-' + k : '',
+      estado, origen: tipo === 'puerta' ? 'puerta' : 'dm',
+      entro, entroEn: entro ? Date.parse('2026-10-24T19:52:00-06:00') + i * 190000 : null, entroPor: entro ? orgs[i % 3] : null,
+      creadoEn: creado, creadoPor: orgs[(i * 7 + (i > 10 ? 1 : 0)) % 3],
+      aprobadoEn: estado === 'aprobado' ? creado + 3 * 36e5 : null, aprobadoPor: estado === 'aprobado' ? orgs[(i * 5) % 3] : null,
+      rechazadoEn: estado === 'rechazado' ? creado + 36e5 : null, rechazadoPor: estado === 'rechazado' ? 'andrea' : null, notas: ''
+    };
+  });
+}
+
+/* ---------- pestañas ---------- */
+const TABS = ['panel', 'solicitudes', 'registrar', 'puerta', 'lista', 'control'];
+const live = () => S.mode === 'live' || S.mode === 'demo';
+function setTab(t) {
+  if (!TABS.includes(t)) t = 'panel';
+  S.tab = t;
+  const on = live();
+  $$('.view').forEach(v => v.hidden = !on || v.dataset.view !== t);
+  $$('.tabs a').forEach(a => a.dataset.tab === t ? a.setAttribute('aria-current', 'page') : a.removeAttribute('aria-current'));
+  if (t === 'control') renderShare(false);
+  if (t === 'puerta' && matchMedia('(pointer:fine)').matches) setTimeout(() => $('#door-q').focus(), 30);
+  if (t === 'panel') { drawPanelPumpkin(performance.now()); if (on) { $('#chart-days').innerHTML = chartDays(); wireTips($('#chart-days')); } }
+}
+addEventListener('hashchange', () => setTab(location.hash.slice(1)));
+let rsT = 0;
+addEventListener('resize', () => { clearTimeout(rsT); rsT = setTimeout(() => { if (S.tab === 'panel' && live()) { $('#chart-days').innerHTML = chartDays(); wireTips($('#chart-days')); } }, 150); });
+
+/* ---------- render ---------- */
+function stats() {
+  const g = S.guests, ok = g.filter(isOk), sum = a => a.reduce((s, x) => s + (+x.monto || 0), 0);
+  const pend = ok.filter(x => x.pago === 'pendiente');
+  return {
+    total: ok.length,
+    pre: ok.filter(x => x.tipo === 'preventa').length,
+    asis: ok.filter(x => x.tipo === 'asistencia').length,
+    cort: ok.filter(x => x.tipo === 'cortesia').length,
+    door: ok.filter(x => x.tipo === 'puerta').length,
+    inside: g.filter(x => x.entro).length,
+    porAprobar: g.filter(x => est(x) === 'solicitud').length,
+    rech: g.filter(x => est(x) === 'rechazado').length,
+    cobrado: sum(ok.filter(x => x.pago === 'pagado')), porCobrar: sum(pend), pendN: pend.length,
+    cobradoPuerta: sum(ok.filter(x => x.pago === 'pagado' && x.tipo === 'puerta'))
+  };
+}
+const orgName = id => !id ? 'Sin dato' : id === 'web' ? 'la página' : ((S.cuentas[id] && S.cuentas[id].nombre) || id);
+
+function render() {
+  if (!live()) return;
+  renderBoard(); renderShare(false);
+  const n = stats().porAprobar;
+  $('#badge').hidden = !n; $('#badge').textContent = n;
+  renderPanel(); renderSolicitudes(); renderDoor(); renderList();
+}
+
+function renderWho() {
+  const el = $('#who'), acc = myAcc();
+  if (!acc) { el.innerHTML = ''; return; }
+  const rol = S.mode === 'demo' ? 'Demo' : acc.rol === 'dueño' ? 'Dueño' : 'Organizador';
+  el.innerHTML = `<span><b class="who-name" id="who-n"></b><small>${rol}</small></span>
+    <button class="pill" type="button" data-act="lock" title="Cerrar la taquilla en este celular"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>Bloquear</button>`;
+  $('#who-n').textContent = acc.nombre || acc.usuario;
+}
+
+let pumpTarget = 0;
+function renderPanel() {
+  const st = stats(), meta = +S.config.meta || 0;
+  countTo($('#k-pre'), st.pre);
+  $('#k-pre-l').textContent = st.pre === 1 ? 'preventa aprobada' : 'preventas aprobadas';
+  const extra = [st.asis ? `${st.asis} ${st.asis === 1 ? 'confirmado paga' : 'confirmados pagan'} en puerta` : '', st.cort ? `${st.cort} ${st.cort === 1 ? 'cortesía' : 'cortesías'}` : ''].filter(Boolean).join(' · ');
+  const metaTxt = meta ? (st.pre >= meta ? `Meta de ${meta} cumplida.` : `Meta: ${meta}. Faltan ${meta - st.pre}.`) : 'Pon una meta en Ajustes para ver cuánto falta.';
+  $('#k-meta').textContent = metaTxt + (extra ? ' ' + extra + '.' : '');
+  const pct = st.total ? Math.round(st.inside / st.total * 100) : 0;
+  $('#m-in').style.width = Math.min(100, pct) + '%';
+  $('#meter').setAttribute('aria-label', `${st.inside} adentro de ${st.total} aprobados`);
+  $('#k-in').innerHTML = `<b style="color:var(--moss)">${st.inside} adentro</b> de ${st.total} aprobados (${pct}%)`;
+  pumpTarget = st.total ? Math.min(1, st.inside / st.total) : 0;
+  if (reduced) drawPanelPumpkin(0);
+  $('#stats').innerHTML = [
+    `<div class="stat"><b>${money(st.cobrado)}</b><span>cobrado</span></div>`,
+    `<div class="stat"><b>${money(st.porCobrar)}</b><span>${st.pendN === 1 ? '1 persona debe' : `${st.pendN} personas deben`}</span></div>`,
+    `<a class="stat" href="#solicitudes"><b>${st.porAprobar}</b><span>por aprobar</span></a>`,
+    `<div class="stat"><b>${st.door}</b><span>en puerta (${money(st.cobradoPuerta)})</span></div>`
+  ].join('');
+  $('#chart-days').innerHTML = chartDays();
+  wireTips($('#chart-days'));
+  $('#chart-org').innerHTML = chartOrgs();
+  $('#feed').innerHTML = feedItems(8);
+  const cos = S.guests.filter(g => est(g) !== 'rechazado' && (g.disfraz || '').trim()).sort((a, b) => norm(a.nombre).localeCompare(norm(b.nombre)));
+  $('#costumes').innerHTML = cos.length
+    ? '<ul class="costumes">' + cos.map(g => `<li><b>${esc(g.nombre)}</b><span>${esc(g.disfraz)}</span></li>`).join('') + '</ul>'
+    : '<p class="empty">Cuando alguien diga de qué se va a disfrazar, aparece aquí. Sirve para la rifa de la botella.</p>';
+}
+let cuRaf = 0;
+function countTo(el, to) {
+  const from = +el.dataset.v || 0; el.dataset.v = to;
+  if (reduced || from === to) { el.textContent = to; return; }
+  cancelAnimationFrame(cuRaf);
+  const t0 = performance.now();
+  const step = t => { const k = Math.min(1, (t - t0) / 700), e = 1 - Math.pow(1 - k, 3); el.textContent = Math.round(from + (to - from) * e); if (k < 1) cuRaf = requestAnimationFrame(step); };
+  cuRaf = requestAnimationFrame(step);
+  el.classList.remove('bump'); void el.offsetWidth; el.classList.add('bump');
+}
+
+function chartDays() {
+  const pre = S.guests.filter(x => isOk(x) && x.tipo === 'preventa' && x.creadoEn);
+  if (!pre.length) return '<p class="empty">Todavía no hay preventas aprobadas. Aprueba la primera en <a href="#solicitudes">Solicitudes</a>.</p>';
+  const counts = {}; pre.forEach(x => { const k = dayKey(x.creadoEn); counts[k] = (counts[k] || 0) + 1; });
+  const start = Math.min(...pre.map(x => x.creadoEn)), end = Math.max(Math.min(Date.now(), EVENT_AT), ...pre.map(x => x.creadoEn));
+  const days = [];
+  for (let t = start; t <= end + 43200000; t += 43200000) { const k = dayKey(t); if (!days.length || days[days.length - 1].k !== k) days.push({ k, t, n: counts[k] || 0 }); }
+  const D = days.slice(-21), n = D.length;
+  const W = Math.max(300, Math.round($('#chart-days').clientWidth || 640)), H = 220, L = 30, R = 6, T = 22, B = 30, pw = W - L - R, ph = H - T - B;
+  const mx = Math.max(...D.map(d => d.n)); const top = Math.max(2, Math.ceil(mx / 2) * 2);
+  const band = pw / n, bw = Math.max(4, Math.min(34, band - 4));
+  const y = v => T + ph - v / top * ph;
+  const bp = (x, yy, w, h, r) => { r = Math.min(r, h, w / 2); return `M${x},${yy + h}V${yy + r}Q${x},${yy} ${x + r},${yy}H${x + w - r}Q${x + w},${yy} ${x + w},${yy + r}V${yy + h}Z`; };
+  let s = `<svg data-w="${W}" viewBox="0 0 ${W} ${H}" role="img" aria-label="Preventas por día, ${pre.length} en total">`;
+  [0, top / 2, top].forEach(v => { s += `<line class="grid" x1="${L}" x2="${W - R}" y1="${y(v)}" y2="${y(v)}"/><text class="axis" x="${L - 8}" y="${y(v) + 4}" text-anchor="end">${v}</text>`; });
+  const every = Math.max(1, Math.ceil(n / Math.max(3, Math.floor(pw / 56))));
+  const maxI = D.findIndex(d => d.n === mx);
+  D.forEach((d, i) => {
+    const x = L + i * band + (band - bw) / 2, h = d.n / top * ph;
+    const label = `${dm(d.t)}: ${d.n} ${d.n === 1 ? 'preventa' : 'preventas'}`;
+    s += `<g class="bar" tabindex="0" data-tip="${esc(label)}" data-x="${x + bw / 2}" data-y="${y(d.n)}"><rect x="${L + i * band}" y="${T}" width="${band}" height="${ph}"/>${h > 0 ? `<path d="${bp(x, y(d.n), bw, h, 4)}"/>` : ''}</g>`;
+    if ((i === maxI || i === n - 1) && d.n > 0) s += `<text class="val" x="${x + bw / 2}" y="${y(d.n) - 6}" text-anchor="middle">${d.n}</text>`;
+    if (i % every === 0 || i === n - 1) s += `<text class="axis" x="${x + bw / 2}" y="${H - 8}" text-anchor="middle">${esc(dm(d.t))}</text>`;
+  });
+  return s + '</svg><div class="tip" hidden></div>';
+}
+function wireTips(box) {
+  const tip = box.querySelector('.tip'), svg = box.querySelector('svg'); if (!tip || !svg) return;
+  const show = g => {
+    const r = svg.getBoundingClientRect(), k = r.width / (+svg.dataset.w || 640);
+    tip.textContent = g.dataset.tip; tip.hidden = false;
+    tip.style.left = Math.max(60, Math.min(r.width - 60, g.dataset.x * k)) + 'px'; tip.style.top = (g.dataset.y * k) + 'px';
+  };
+  box.querySelectorAll('.bar').forEach(g => {
+    g.addEventListener('pointerenter', () => show(g)); g.addEventListener('focus', () => show(g));
+    g.addEventListener('pointerleave', () => tip.hidden = true); g.addEventListener('blur', () => tip.hidden = true);
+  });
+}
+function chartOrgs() {
+  const c = {};
+  S.guests.forEach(g => { if (isOk(g) && g.tipo !== 'puerta') { const k = g.aprobadoPor || g.creadoPor || '_'; c[k] = (c[k] || 0) + 1; } });
+  const rows = Object.entries(c).sort((a, b) => b[1] - a[1]);
+  if (!rows.length) return '<p class="empty">Aquí aparece cuántas entradas ha aprobado cada quien.</p>';
+  const mx = rows[0][1];
+  return '<ul class="orgs">' + rows.map(([id, n]) => `<li><span class="on">${esc(id === '_' ? 'Sin dato' : orgName(id))}</span><span class="oc">${n}</span><span class="ob" style="width:${Math.max(2, n / mx * 100)}%"></span></li>`).join('') + '</ul>';
+}
+function feedItems(max) {
+  const ev = [];
+  S.guests.forEach(g => {
+    if (g.creadoEn && g.tipo !== 'puerta') {
+      if (g.origen === 'web') ev.push({ t: g.creadoEn, a: g.nombre, b: `Pidió lugar desde la página (${TIPO[g.tipo] || 'entrada'})` });
+      else if (g.origen === 'dm' || g.solicitud) ev.push({ t: g.creadoEn, a: g.nombre, b: `Pidió lugar por DM (${TIPO[g.tipo] || 'entrada'}), lo pasó ${orgName(g.creadoPor)}` });
+      else ev.push({ t: g.creadoEn, a: g.nombre, b: `${TIPO[g.tipo] || 'Registro'} directo, lo registró ${orgName(g.creadoPor)}` });
+    }
+    if (g.aprobadoEn && (g.origen === 'dm' || g.solicitud)) ev.push({ t: g.aprobadoEn, a: g.nombre, b: `Aprobada por ${orgName(g.aprobadoPor)}${g.pago === 'pendiente' ? ', con pago pendiente' : ''}` });
+    if (est(g) === 'rechazado' && g.rechazadoEn) ev.push({ t: g.rechazadoEn, a: g.nombre, b: g.rechazadoPor === 'web' ? 'Canceló desde la página' : `Rechazada por ${orgName(g.rechazadoPor)}` });
+    if (g.entro && g.entroEn) ev.push({ t: g.entroEn, a: g.nombre, b: g.tipo === 'puerta' ? `Pagó ${money(g.monto)} en puerta y entró` : 'Entró a la fiesta' });
+  });
+  ev.sort((x, y) => y.t - x.t);
+  if (!ev.length) return '<li class="muted">Aquí verás cada solicitud, aprobación y entrada en cuanto pasen.</li>';
+  return ev.slice(0, max).map(e => `<li><time>${dm(e.t)} ${tm(e.t)}</time><div class="fx">${esc(e.a)}<span>${esc(e.b)}</span></div></li>`).join('');
+}
+
+/* ---------- tablero de control ---------- */
+function renderBoard() {
+  const g = S.guests, ok = g.filter(isOk), st = stats(), cupo = +S.config.cupo || 0;
+  const sum = a => a.reduce((s, x) => s + (+x.monto || 0), 0);
+  const pend = g.filter(x => est(x) === 'solicitud');
+  const old = pend.length ? Math.min(...pend.map(x => x.creadoEn || Date.now())) : 0;
+  const mins = old ? Math.round((Date.now() - old) / 6e4) : 0;
+  const capPct = cupo ? Math.min(100, Math.round(st.total / cupo * 100)) : 0;
+  const k = [
+    [st.porAprobar, 'por aprobar' + (mins ? `, la más vieja hace ${mins < 60 ? mins + ' min' : Math.round(mins / 60) + ' h'}` : ''), st.porAprobar ? 'warn' : '', '#solicitudes'],
+    [st.total, cupo ? `aprobados de ${cupo} de cupo` : 'aprobados', cupo && capPct >= 90 ? 'bad' : 'ok', '#lista', cupo ? capPct : null],
+    [st.pre, 'preventas'], [st.asis, 'pagan en puerta'], [st.cort, 'cortesías'],
+    [st.inside, `adentro (${st.total ? Math.round(st.inside / st.total * 100) : 0}%)`, '', '#puerta'],
+    [money(st.cobrado), 'cobrado', 'ok'], [money(st.porCobrar), `por cobrar · ${st.pendN} ${st.pendN === 1 ? 'persona' : 'personas'}`, st.pendN ? 'warn' : ''],
+    [st.rech, 'rechazadas']
+  ];
+  $('#kpis').innerHTML = k.map(([b, l, tone, href, bar]) => `<${href ? `a href="${href}"` : 'div'} class="kpi ${tone || ''}"><b>${b}</b><span>${esc(l)}</span>${bar != null ? `<div class="bar"><i style="width:${bar}%"></i></div>` : ''}</${href ? 'a' : 'div'}>`).join('');
+  const paid = ok.filter(x => x.pago === 'pagado');
+  const rowsM = [
+    ['Preventas pagadas', paid.filter(x => x.tipo === 'preventa')],
+    ['Preventas por cobrar', ok.filter(x => x.tipo === 'preventa' && x.pago === 'pendiente')],
+    ['Cover de confirmados', ok.filter(x => x.tipo === 'asistencia')],
+    ['Venta en puerta', ok.filter(x => x.tipo === 'puerta')],
+    ['Cortesías', ok.filter(x => x.tipo === 'cortesia')]
+  ];
+  const tr = paid.filter(x => x.metodo === 'transferencia'), ef = paid.filter(x => x.metodo !== 'transferencia');
+  $('#t-money').innerHTML = '<thead><tr><th>Concepto</th><th class="n">Personas</th><th class="n">Monto</th></tr></thead><tbody>' +
+    rowsM.map(([l, a]) => `<tr><td>${l}</td><td class="n">${a.length}</td><td class="n">${money(sum(a))}</td></tr>`).join('') +
+    `<tr><td>Cobrado por transferencia</td><td class="n">${tr.length}</td><td class="n">${money(sum(tr))}</td></tr><tr><td>Cobrado en efectivo</td><td class="n">${ef.length}</td><td class="n">${money(sum(ef))}</td></tr>` +
+    `<tr class="tot"><td>Total cobrado</td><td class="n">${paid.length}</td><td class="n">${money(sum(paid))}</td></tr></tbody>`;
+  const team = {};
+  const T = id => (team[id] = team[id] || { reg: 0, apr: 0, rech: 0, pas: 0, door: 0 });
+  g.forEach(x => {
+    if (x.creadoPor && x.creadoPor !== 'web' && x.tipo !== 'puerta') T(x.creadoPor).reg++;
+    if (x.aprobadoPor && x.tipo !== 'puerta') T(x.aprobadoPor).apr++;
+    if (x.rechazadoPor && est(x) === 'rechazado') T(x.rechazadoPor).rech++;
+    if (x.entro && x.entroPor) T(x.entroPor).pas++;
+    if (x.tipo === 'puerta' && x.pago === 'pagado' && x.creadoPor) T(x.creadoPor).door += (+x.monto || 0);
+  });
+  Object.keys(S.cuentas).forEach(T);
+  const ids = Object.keys(team).sort((a, b) => orgName(a).localeCompare(orgName(b)));
+  $('#t-team').innerHTML = '<thead><tr><th>Quién</th><th class="n">Registró</th><th class="n">Aprobó</th><th class="n">Rechazó</th><th class="n">Pasó</th><th class="n">Cobró en puerta</th></tr></thead><tbody>' +
+    (ids.length ? ids.map(id => { const t = team[id]; return `<tr><td>${esc(orgName(id))}</td><td class="n">${t.reg}</td><td class="n">${t.apr}</td><td class="n">${t.rech}</td><td class="n">${t.pas}</td><td class="n">${money(t.door)}</td></tr>`; }).join('') : '<tr><td colspan="6" class="muted">Sin movimientos todavía.</td></tr>') + '</tbody>';
+}
+
+/* ---------- descargar archivos ---------- */
+function saveFile(name, blob, okMsg) {
+  try {
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a'); a.href = url; a.download = name; a.rel = 'noopener';
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 30000);
+    if (okMsg) toast(okMsg);
+  } catch (e) { toast('Este navegador no dejó descargar. Prueba desde Chrome o Safari.', 'error'); }
+}
+
+/* ---------- Excel ---------- */
+let xlsxP = null;
+function loadXLSX() {
+  if (window.XLSX) return Promise.resolve(window.XLSX);
+  return xlsxP = xlsxP || new Promise((res, rej) => {
+    const sc = document.createElement('script');
+    sc.src = 'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js';
+    sc.onload = () => window.XLSX ? res(window.XLSX) : rej(new Error('xlsx'));
+    sc.onerror = () => { xlsxP = null; rej(new Error('xlsx')); };
+    document.head.appendChild(sc);
+  });
+}
+const ORIGEN = { web: 'Página', dm: 'DM', taquilla: 'Taquilla', puerta: 'Puerta' };
+const when = ms => ms ? `${dm(ms)} ${tm(ms)}` : '';
+function rowOf(g) {
+  return {
+    'Nombre': g.nombre || '', 'Instagram': g.instagram ? '@' + g.instagram : '', 'Comprobante': g.comprobante ? 'Recibido' : '', 'Comprobante lo vio': g.comprobante ? orgName(g.comprobantePor) : '',
+    'Teléfono o contacto': g.contacto || '', 'Correo': g.correo || '', 'Disfraz': g.disfraz || '',
+    'Tipo': TIPO[g.tipo] || g.tipo || '', 'Estado': ESTADO[est(g)], 'Monto': +g.monto || 0, 'Pago': g.pago === 'pendiente' && +g.monto > 0 ? 'Pendiente' : 'Pagado',
+    'Cómo pagó': g.pago === 'pagado' ? (g.metodo || '') : '', 'Código boleto': g.codigo || '', 'Código solicitud': g.solicitud || '',
+    'Origen': ORIGEN[g.origen] || '', 'Registrado': when(g.creadoEn), 'Registró': orgName(g.creadoPor), 'Aprobó': g.aprobadoPor ? orgName(g.aprobadoPor) : '',
+    'Aprobado': when(g.aprobadoEn), 'Entró': g.entro ? 'Sí' : 'No', 'Hora de entrada': g.entroEn ? tm(g.entroEn) : '', 'Lo pasó': g.entroPor ? orgName(g.entroPor) : '', 'Notas': g.notas || ''
+  };
+}
+async function exportExcel() {
+  if (!S.guests.length) { toast('Todavía no hay registros para descargar.'); return; }
+  toast('Armando el Excel…');
+  let X;
+  try { X = await loadXLSX(); } catch (e) { toast('No se pudo cargar el generador de Excel. Revisa tu internet o usa CSV.', 'error'); return; }
+  const by = (a, b) => (a.creadoEn || 0) - (b.creadoEn || 0);
+  const all = S.guests.slice().sort(by);
+  const sheet = list => {
+    const ws = X.utils.json_to_sheet(list.length ? list.map(rowOf) : [rowOf({})]);
+    if (!list.length) X.utils.sheet_add_aoa(ws, [[]], { origin: 'A2' });
+    ws['!cols'] = [24, 22, 13, 16, 20, 26, 22, 16, 12, 8, 10, 13, 13, 15, 10, 14, 12, 12, 14, 7, 14, 12, 30].map(w => ({ wch: w }));
+    ws['!autofilter'] = { ref: ws['!ref'] };
+    return ws;
+  };
+  const st = stats(), ok = S.guests.filter(isOk), paid = ok.filter(x => x.pago === 'pagado'), sum = a => a.reduce((s, x) => s + (+x.monto || 0), 0);
+  const res = X.utils.aoa_to_sheet([
+    ['BUULLAKEO · Base de invitados'], ['Descargado', when(Date.now())], [],
+    ['Concepto', 'Cantidad', 'Monto'],
+    ['Solicitudes por aprobar', st.porAprobar, ''], ['Aprobados', st.total, ''], ['Rechazadas', st.rech, ''],
+    ['Preventas', st.pre, sum(ok.filter(x => x.tipo === 'preventa'))], ['Pagan en puerta', st.asis, sum(ok.filter(x => x.tipo === 'asistencia'))],
+    ['Cortesías', st.cort, 0], ['Venta en puerta', st.door, sum(ok.filter(x => x.tipo === 'puerta'))], ['Adentro', st.inside, ''],
+    ['Cobrado', paid.length, sum(paid)], ['Cobrado por transferencia', paid.filter(x => x.metodo === 'transferencia').length, sum(paid.filter(x => x.metodo === 'transferencia'))],
+    ['Cobrado en efectivo', paid.filter(x => x.metodo !== 'transferencia').length, sum(paid.filter(x => x.metodo !== 'transferencia'))],
+    ['Por cobrar', st.pendN, st.porCobrar],
+    ['Comprobantes recibidos', S.guests.filter(g => g.comprobante && est(g) !== 'rechazado').length, ''],
+    ['Preventas sin comprobante', S.guests.filter(g => g.tipo === 'preventa' && est(g) !== 'rechazado' && g.pago === 'pendiente' && !g.comprobante).length, '']
+  ]);
+  res['!cols'] = [{ wch: 28 }, { wch: 12 }, { wch: 12 }];
+  const wb = X.utils.book_new();
+  X.utils.book_append_sheet(wb, res, 'Resumen');
+  X.utils.book_append_sheet(wb, sheet(all), 'Todos');
+  X.utils.book_append_sheet(wb, sheet(all.filter(g => est(g) === 'solicitud')), 'Por aprobar');
+  X.utils.book_append_sheet(wb, sheet(all.filter(isOk)), 'Aprobados');
+  X.utils.book_append_sheet(wb, sheet(all.filter(g => est(g) === 'rechazado')), 'Rechazadas');
+  X.utils.book_append_sheet(wb, sheet(all.filter(g => g.entro)), 'Adentro');
+  X.utils.book_append_sheet(wb, sheet(all.filter(g => g.comprobante)), 'Con comprobante');
+  const buf = X.write(wb, { bookType: 'xlsx', type: 'array' });
+  const stamp = new Intl.DateTimeFormat('en-CA', { timeZone: TZ, year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hourCycle: 'h23' }).format(Date.now()).replace(/[^0-9]+/g, '-');
+  saveFile(`buullakeo-base-${stamp}.xlsx`, new Blob([buf], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }), 'Excel listo.');
+}
+
+/* ---------- solicitudes ---------- */
+function parseDM(t) {
+  const out = { nombre: '', instagram: '', contacto: '', correo: '', tipo: '', solicitud: '' };
+  const raw = String(t || '');
+  const code = raw.match(/SOL-?\s?([A-Z0-9]{4})\b/i); if (code) out.solicitud = 'SOL-' + code[1].toUpperCase();
+  const line = re => { const m = raw.match(re); return m ? m[1].trim() : ''; };
+  out.nombre = line(/nombre\s*:\s*(.+)/i);
+  const ent = line(/entrada\s*:\s*(.+)/i);
+  out.tipo = /puerta|cover/i.test(ent) ? 'asistencia' : /preventa/i.test(ent) ? 'preventa' : '';
+  out.instagram = cleanIg(line(/(?:instagram|ig)\s*:\s*(.+)/i));
+  out.contacto = line(/(?:tel[eé]fono|whats(?:app)?|celular|contacto)\s*:\s*(.+)/i);
+  out.correo = line(/correo\s*:\s*(\S+@\S+)/i);
+  out.disfraz = line(/disfraz\s*:\s*(.+)/i);
+  if (!out.nombre && !out.solicitud) {
+    const s = raw.trim();
+    if (s && !s.includes('\n') && s.length <= 60) out.nombre = s;
+  }
+  return out;
+}
+function onPaste() {
+  const p = parseDM($('#s-paste').value), msg = $('#s-parse');
+  if (!$('#s-paste').value.trim()) { msg.textContent = 'También puedes escribir los datos a mano abajo.'; msg.classList.add('miss'); checkDup(); return; }
+  const got = [];
+  if (p.nombre) { $('#s-nombre').value = p.nombre; got.push('nombre'); $('#s-nombre').removeAttribute('aria-invalid'); $('#s-nombre-err').hidden = true; }
+  if (p.instagram) { $('#s-ig').value = p.instagram; got.push('Instagram'); }
+  if (p.contacto) { $('#s-contacto').value = p.contacto; got.push('teléfono'); }
+  if (p.correo) { $('#s-correo').value = p.correo; got.push('correo'); }
+  if (p.disfraz) { $('#s-disfraz').value = p.disfraz; got.push('disfraz'); }
+  if (p.tipo) { (p.tipo === 'asistencia' ? $('#s-t-asi') : $('#s-t-pre')).checked = true; got.push('entrada'); }
+  $('#f-sol').dataset.sol = p.solicitud || '';
+  if (got.length) { msg.textContent = `Leí ${got.join(', ')}${p.solicitud ? ' y el código ' + p.solicitud : ''}. Revisa y guarda.`; msg.classList.remove('miss'); }
+  else { msg.textContent = 'No encontré datos en el mensaje. Escríbelos a mano abajo.'; msg.classList.add('miss'); }
+  checkDup();
+}
+function checkDup() {
+  const sol = $('#f-sol').dataset.sol || '', nm = norm($('#s-nombre').value), box = $('#s-dup');
+  const bySol = sol && S.guests.find(g => g.solicitud === sol);
+  const byName = !bySol && nm.length > 2 && S.guests.find(g => norm(g.nombre) === nm && est(g) !== 'rechazado');
+  $('#s-save').disabled = !!bySol; $('#s-now').disabled = !!bySol;
+  if (bySol) { box.textContent = `Esta solicitud ya está registrada: ${bySol.nombre}, ${ESTADO[est(bySol)].toLowerCase()}.`; box.hidden = false; }
+  else if (byName) { box.textContent = `Ya hay alguien llamado ${byName.nombre} (${ESTADO[est(byName)].toLowerCase()}). Revisa que no sea la misma persona.`; box.hidden = false; }
+  else box.hidden = true;
+}
+function solDraft() {
+  const nombre = $('#s-nombre').value.trim(), correo = $('#s-correo').value.trim();
+  if (nombre.length < 2) { fieldErr('#s-nombre', 'Falta el nombre de la persona.'); return null; }
+  const instagram = igField('#s-ig', false); if (instagram === null) return null;
+  const tipo = radio('s-tipo') || 'preventa';
+  return { nombre, instagram, contacto: $('#s-contacto').value.trim(), correo, disfraz: $('#s-disfraz').value.trim(), tipo, monto: priceFor(tipo), pago: 'pendiente', metodo: 'transferencia', estado: 'solicitud', origen: 'dm' };
+}
+function resetSol() { $('#f-sol').reset(); $('#f-sol').dataset.sol = ''; $('#s-dup').hidden = true; $('#s-save').disabled = false; $('#s-now').disabled = false; const m = $('#s-parse'); m.textContent = 'También puedes escribir los datos a mano abajo.'; m.classList.add('miss'); }
+$('#s-paste').addEventListener('input', onPaste);
+$('#s-nombre').addEventListener('input', checkDup);
+$('#f-sol').addEventListener('submit', async e => {
+  e.preventDefault();
+  const d = solDraft(); if (!d) return;
+  $('#s-save').disabled = true;
+  const r = await api('crear', d);
+  $('#s-save').disabled = false;
+  if (r.ok) { resetSol(); toast(`${d.nombre} quedó por aprobar.`); }
+});
+$('#s-now').addEventListener('click', () => { const d = solDraft(); if (d) openApprove(null, d); });
+
+function renderSolicitudes() {
+  $('#lnk').textContent = shareLink();
+  const pend = S.guests.filter(g => est(g) === 'solicitud').sort((a, b) => (a.creadoEn || 0) - (b.creadoEn || 0));
+  const rej = S.guests.filter(g => est(g) === 'rechazado').sort((a, b) => (b.rechazadoEn || 0) - (a.rechazadoEn || 0));
+  $('#pend-n').textContent = pend.length;
+  $('#pend-list').innerHTML = pend.length ? pend.map(pendCard).join('') : '<p class="empty">No hay nada por aprobar. Cuando llegue un DM, pégalo arriba.</p>';
+  $('#rej-sum').textContent = `Rechazadas (${rej.length})`;
+  $('#rej-list').innerHTML = rej.length ? rej.map(g => `<article class="dcard"><div class="dc-main"><p class="dc-name">${esc(g.nombre)}</p><p class="dc-meta"><span class="code sol">${esc(g.solicitud || '')}</span><span class="chip bad">${g.rechazadoPor === 'web' ? 'La canceló el invitado' : 'Rechazada por ' + esc(orgName(g.rechazadoPor))}</span></p></div><button class="btn sm" type="button" data-act="restore" data-id="${esc(g.id)}">Regresar a por aprobar</button></article>`).join('') : '<p class="muted">Ninguna.</p>';
+}
+function pendCard(g) {
+  const sub = [igLink(g.instagram), ...[g.contacto, g.correo, g.disfraz ? 'Disfraz: ' + g.disfraz : ''].filter(Boolean).map(esc)].filter(Boolean).join(' · ');
+  return `<article class="dcard is-pend${flashCls(g.id)}"><div class="dc-main">
+    <p class="dc-name">${esc(g.nombre)}</p>
+    <p class="dc-meta"><span class="code sol">${esc(g.solicitud || '')}</span><span class="chip">${esc(TIPO[g.tipo] || g.tipo)} ${money(g.monto)}</span><span class="chip warn">Llegó ${dm(g.creadoEn)} ${tm(g.creadoEn)}</span></p>
+    ${sub ? `<p class="dc-sub">${sub}</p>` : ''}
+  </div><div class="dc-act">
+    ${compBtn(g)}
+    <button class="btn btn-ok" type="button" data-act="approve" data-id="${esc(g.id)}">Aprobar</button>
+    <button class="btn danger" type="button" data-act="reject" data-id="${esc(g.id)}" data-armed="${S.rejectArmed === g.id ? 1 : 0}">${S.rejectArmed === g.id ? 'Sí, rechazar' : 'Rechazar'}</button>
+  </div></article>`;
+}
+
+/* aprobar */
+let approveCtx = null;
+function setApproveTipo(tipo) {
+  const t = { preventa: '#a-t-pre', asistencia: '#a-t-asi', cortesia: '#a-t-cor' }[tipo] || '#a-t-pre';
+  $(t).checked = true;
+  $('#a-monto').value = priceFor(tipo);
+  (tipo === 'asistencia' ? $('#a-p-no') : $('#a-p-si')).checked = true;
+  syncApprove();
+}
+function syncApprove() {
+  const tipo = radio('a-tipo'), pago = radio('a-pago');
+  $('#a-pago-f').hidden = tipo === 'cortesia';
+  $('#a-met-f').hidden = tipo === 'cortesia' || pago !== 'pagado';
+  $('#a-hint').textContent = tipo === 'asistencia' && pago === 'pendiente' ? `Paga ${money($('#a-monto').value)} en la puerta. Su boleto lo dice.`
+    : tipo === 'preventa' && pago === 'pendiente' ? 'Queda aprobada con pago pendiente. En la puerta te sale para cobrarle.'
+    : tipo === 'preventa' ? 'Aprueba cuando ya viste su comprobante.' : '';
+}
+function openApprove(id, draft) {
+  const g = id ? byId(id) : draft; if (!g) return;
+  approveCtx = { id, draft };
+  $('#ma-title').textContent = 'Aprobar a ' + g.nombre;
+  $('#ma-sub').textContent = [g.solicitud, g.instagram ? '@' + g.instagram : '', g.comprobante ? 'Comprobante recibido ✓' : (g.tipo === 'preventa' ? 'Sin comprobante todavía' : ''), g.contacto, g.correo].filter(Boolean).join(' · ');
+  setApproveTipo(g.tipo === 'cortesia' ? 'cortesia' : g.tipo === 'asistencia' ? 'asistencia' : 'preventa');
+  openModal($('#m-approve'));
+}
+document.addEventListener('change', e => {
+  if (e.target.name === 'a-tipo') setApproveTipo(e.target.value);
+  if (e.target.name === 'a-pago') syncApprove();
+  if (e.target.name === 'n-tipo') { setDefaults(); if (e.target.value === 'cortesia') $('#n-pago-si').checked = true; if (e.target.value === 'asistencia') $('#n-pago-no').checked = true; }
+});
+$('#f-approve').addEventListener('submit', async e => {
+  e.preventDefault();
+  if (!approveCtx) return;
+  const tipo = radio('a-tipo');
+  const pago = tipo === 'cortesia' ? 'pagado' : radio('a-pago');
+  const base = approveCtx.id ? byId(approveCtx.id) : approveCtx.draft;
+  if (!base) return;
+  const datos = { tipo, monto: Math.max(0, +$('#a-monto').value || 0), pago, metodo: pago === 'pagado' ? (radio('a-metodo') || 'transferencia') : (base.metodo || 'transferencia') };
+  const btn = $('#a-save'); btn.disabled = true;
+  let r, id = approveCtx.id;
+  if (id) { if (busy.has(id)) { btn.disabled = false; return; } busy.add(id); r = await api('aprobar', { id, ...datos }); busy.delete(id); }
+  else { r = await api('crear', { ...approveCtx.draft, ...datos, estado: 'aprobado' }); if (r.ok) resetSol(); }
+  btn.disabled = false;
+  if (!r.ok) return;
+  const full = r.g || { ...base, ...datos };
+  approveCtx = null;
+  closeModals(); approvedStamp(full.nombre); play('bell'); toast(`${full.nombre} quedó aprobado.`);
+  setTimeout(() => showTicket(full), reduced ? 0 : 900);
+});
+let rejT = 0;
+async function reject(btn, id) {
+  const g = byId(id); if (!g) return;
+  if (S.rejectArmed !== id) {
+    S.rejectArmed = id; renderSolicitudes();
+    clearTimeout(rejT); rejT = setTimeout(() => { S.rejectArmed = null; renderSolicitudes(); }, 4000);
+    return;
+  }
+  S.rejectArmed = null; clearTimeout(rejT);
+  if (busy.has(id)) return; busy.add(id);
+  const ok = (await api('rechazar', { id })).ok;
+  busy.delete(id);
+  if (ok) { play('thud'); toast(`Rechazaste la solicitud de ${g.nombre}.`); }
+}
+
+/* ---------- puerta ---------- */
+function renderDoor() {
+  const st = stats();
+  $('#door-count').textContent = `${st.inside} adentro`;
+  const raw = $('#door-q').value, q = norm(raw), qc = q.replace(/^(buu|sol)-?/, '');
+  let html;
+  if (!q) html = '<p class="empty">Escribe el nombre o las 4 letras del código del boleto.</p>';
+  else {
+    const hits = S.guests.filter(g => est(g) !== 'rechazado').filter(g => norm(g.nombre).includes(q) || norm(g.contacto).includes(q) || (g.instagram && g.instagram.includes(q.replace(/^@/, ''))) ||
+      (qc && (norm(g.codigo).replace('buu-', '').includes(qc) || norm(g.solicitud).replace('sol-', '').includes(qc))))
+      .sort((a, b) => (a.entro - b.entro) || norm(a.nombre).localeCompare(norm(b.nombre))).slice(0, 8);
+    html = hits.length ? hits.map(doorCard).join('') : `<p class="empty">Nadie coincide con “${esc(raw)}”. Revisa cómo se escribe o usa Venta en puerta.</p>`;
+  }
+  $('#door-results').innerHTML = html;
+  const ins = S.guests.filter(g => g.entro && g.entroEn).sort((a, b) => b.entroEn - a.entroEn).slice(0, 10);
+  $('#door-recent').innerHTML = ins.length ? ins.map(g => `<li><time>${tm(g.entroEn)}</time><div class="fx">${esc(g.nombre)}<span>${esc(TIPO[g.tipo] || '')}, la dejó pasar ${esc(orgName(g.entroPor))}</span></div></li>`).join('') : '<li class="muted">Todavía no entra nadie.</li>';
+}
+function doorLabel(g) {
+  const owes = g.pago === 'pendiente' && +g.monto > 0, sol = est(g) === 'solicitud';
+  const parts = [];
+  if (sol) parts.push('aprobar');
+  if (owes) parts.push(`cobrar ${money(g.monto)}`);
+  const head = parts.length ? parts.join(', ') + ' y dejar pasar' : 'dejar pasar';
+  return head.charAt(0).toUpperCase() + head.slice(1);
+}
+function doorCard(g) {
+  const pend = g.pago === 'pendiente' && +g.monto > 0, sol = est(g) === 'solicitud';
+  const code = g.codigo ? `<span class="code">${esc(g.codigo)}</span>` : `<span class="code sol">${esc(g.solicitud || '')}</span>`;
+  const meta = `${code}<span class="chip">${esc(TIPO[g.tipo] || g.tipo)}</span>${sol ? '<span class="chip warn">Sin aprobar</span>' : ''}${pend ? `<span class="chip warn">Debe ${money(g.monto)}</span>` : ''}`;
+  const act = g.entro
+    ? `<div class="dc-act"><span class="dc-in">Entró ${tm(g.entroEn)}</span><button class="btn sm ghost" type="button" data-act="undo" data-id="${esc(g.id)}">Deshacer</button></div>`
+    : `<button class="btn ${sol || pend ? 'btn-primary' : 'btn-ok'}" type="button" data-act="checkin" data-id="${esc(g.id)}">${esc(doorLabel(g))}</button>`;
+  return `<article class="dcard${g.entro ? ' is-in' : sol ? ' is-pend' : ''}${flashCls(g.id)}"><div class="dc-main"><p class="dc-name">${esc(g.nombre)}</p><p class="dc-meta">${meta}</p>${g.instagram ? `<p class="dc-sub">${igLink(g.instagram)}${g.comprobante ? ' · comprobante recibido' : ''}</p>` : ''}</div>${act}</article>`;
+}
+async function checkin(id) {
+  const g = byId(id); if (!g || busy.has(id)) return;
+  busy.add(id);
+  const r = await api('checkin', { id });
+  busy.delete(id);
+  if (r.ok) { stamp(g.nombre); boo(); }
+}
+async function undoIn(id) {
+  if (busy.has(id)) return; busy.add(id);
+  const r = await api('deshacer', { id });
+  busy.delete(id);
+  if (r.ok) toast('Entrada deshecha.');
+}
+
+/* ---------- lista ---------- */
+const FILTERS = [
+  ['todos', 'Todos', g => est(g) !== 'rechazado'], ['solicitud', 'Por aprobar', g => est(g) === 'solicitud'],
+  ['preventa', 'Preventa', g => isOk(g) && g.tipo === 'preventa'], ['asistencia', 'Pagan en puerta', g => isOk(g) && g.tipo === 'asistencia'],
+  ['cortesia', 'Cortesía', g => isOk(g) && g.tipo === 'cortesia'], ['puerta', 'Venta en puerta', g => g.tipo === 'puerta'],
+  ['pendiente', 'Deben', g => isOk(g) && g.pago === 'pendiente' && +g.monto > 0],
+  ['comprobante', 'Con comprobante', g => g.comprobante && est(g) !== 'rechazado'],
+  ['sincomp', 'Preventa sin comprobante', g => g.tipo === 'preventa' && est(g) !== 'rechazado' && g.pago === 'pendiente' && !g.comprobante],
+  ['adentro', 'Adentro', g => g.entro], ['afuera', 'Sin entrar', g => isOk(g) && !g.entro], ['rechazado', 'Rechazadas', g => est(g) === 'rechazado']
+];
+function estadoChip(g) {
+  const e = est(g);
+  return e === 'solicitud' ? '<span class="chip warn">Por aprobar</span>' : e === 'rechazado' ? '<span class="chip bad">Rechazada</span>' : '<span class="chip ok">Aprobada</span>';
+}
+function renderList() {
+  $('#list-filters').innerHTML = FILTERS.map(([k, l, f]) => `<button type="button" data-act="filter" data-f="${k}" aria-pressed="${S.filter === k}">${l} ${S.guests.filter(f).length}</button>`).join('');
+  const f = (FILTERS.find(x => x[0] === S.filter) || FILTERS[0])[2], q = norm($('#list-q').value), qi = q.replace(/^@/, '');
+  const rows = S.guests.filter(f).filter(g => !q || [g.nombre, g.codigo, g.solicitud, g.contacto, g.correo].some(v => norm(v).includes(q)) || (qi && String(g.instagram || '').includes(qi)))
+    .sort((a, b) => (b.creadoEn || 0) - (a.creadoEn || 0));
+  if (!S.guests.length) { $('#tbody').innerHTML = '<tr><td colspan="8"><p class="empty">Aún no hay invitados. Pega el primer DM en <a href="#solicitudes">Solicitudes</a> o registra a alguien en <a href="#registrar">Registrar</a>.</p></td></tr>'; return; }
+  if (!rows.length) { $('#tbody').innerHTML = '<tr><td colspan="8" class="muted">Nadie coincide con la búsqueda o el filtro.</td></tr>'; return; }
+  $('#tbody').innerHTML = rows.map(g => `<tr class="${flashCls(g.id).trim()}">
+    <td><span class="t-name">${esc(g.nombre)}</span>${g.instagram ? `<span class="t-sub">${igLink(g.instagram)}</span>` : ''}${g.contacto ? `<span class="t-sub">${esc(g.contacto)}</span>` : ''}${g.correo ? `<span class="t-sub">${esc(g.correo)}</span>` : ''}${g.disfraz ? `<span class="t-sub">Disfraz: ${esc(g.disfraz)}</span>` : ''}</td>
+    <td>${g.codigo ? `<span class="code">${esc(g.codigo)}</span>` : ''}${g.solicitud ? `<span class="t-sub">${esc(g.solicitud)}</span>` : ''}</td>
+    <td>${esc(TIPO[g.tipo] || g.tipo)}<span class="t-sub">${money(g.monto)}${g.pago === 'pagado' && g.metodo ? ', ' + esc(g.metodo) : ''}</span></td>
+    <td>${estadoChip(g)}${g.aprobadoPor ? `<span class="t-sub">por ${esc(orgName(g.aprobadoPor))}</span>` : ''}</td>
+    <td>${g.pago === 'pendiente' && +g.monto > 0 ? '<span class="chip warn">Pendiente</span>' : '<span class="chip ok">Pagado</span>'}${compBtn(g) ? `<span class="t-sub" style="margin-top:6px">${compBtn(g)}</span>` : ''}</td>
+    <td>${g.entro ? `<span class="chip in">Adentro ${tm(g.entroEn)}</span>` : '<span class="muted">Sin entrar</span>'}</td>
+    <td>${esc(orgName(g.creadoPor))}<span class="t-sub">${dm(g.creadoEn)}</span></td>
+    <td class="t-act">${isOk(g) ? `<button class="btn sm" type="button" data-act="ticket" data-id="${esc(g.id)}">Boleto</button>` : est(g) === 'solicitud' ? `<button class="btn sm" type="button" data-act="approve" data-id="${esc(g.id)}">Aprobar</button>` : ''}<button class="btn sm ghost" type="button" data-act="edit" data-id="${esc(g.id)}">Editar</button></td>
+  </tr>`).join('');
+}
+
+/* ---------- cuentas ---------- */
+function renderAccounts() {
+  if (!live()) return;
+  const list = Object.values(S.cuentas).sort((a, b) => (a.rol === 'dueño' ? -1 : 0) - (b.rol === 'dueño' ? -1 : 0) || String(a.nombre).localeCompare(String(b.nombre)));
+  const boss = isBoss();
+  $('#acct-list').innerHTML = list.map(a => {
+    const mine = a.id === me();
+    const chip = a.temporal ? '<span class="chip warn">Contraseña temporal</span>' : '<span class="chip ok">Activa</span>';
+    const armed = S.removeArmed === a.id;
+    const btn = boss && !mine ? `<button class="btn sm" type="button" data-act="reset-open" data-u="${esc(a.id)}">Restablecer contraseña</button><button class="btn sm danger" type="button" data-act="remove-user" data-u="${esc(a.id)}" data-armed="${armed ? 1 : 0}">${armed ? 'Sí, quitar' : 'Quitar'}</button>` : '';
+    const form = S.resetOpen === a.id ? `<form class="reset" data-u="${esc(a.id)}" id="f-reset" novalidate><label class="sr" for="r-pass">Contraseña temporal para ${esc(a.nombre || a.id)}</label><input type="text" id="r-pass" autocomplete="off" placeholder="Contraseña temporal (mín. 8)"><button class="btn sm btn-primary" type="submit">Guardar</button><button class="btn sm ghost" type="button" data-act="reset-close">Cancelar</button></form>` : '';
+    return `<li><div class="acct-id"><b>${esc(a.nombre || a.id)}${mine ? ' <span class="muted">(tú)</span>' : ''}</b><span>Usuario: ${esc(a.id)}${a.correo ? ' · ' + esc(a.correo) : ''}${a.rol === 'dueño' ? ' · dueño' : ''}</span></div><div class="row">${chip}${btn}</div>${form}</li>`;
+  }).join('') || '<li class="muted">No hay cuentas.</li>';
+  $('#f-adduser').hidden = !boss; $('#ctl-danger').hidden = !boss;
+  const acc = myAcc();
+  if (acc && !$('#f-me').contains(document.activeElement)) $('#me-correo').value = acc.correo || '';
+}
+document.addEventListener('submit', async e => {
+  const f = e.target;
+  if (f.id === 'f-login') { e.preventDefault(); doLogin(); }
+  else if (f.id === 'f-newpass') { e.preventDefault(); doNewPass(); }
+  else if (f.id === 'f-reset') {
+    e.preventDefault();
+    const u = f.dataset.u, pw = $('#r-pass').value.trim();
+    if (pw.length < 8) { toast('La contraseña temporal necesita al menos 8 caracteres.', 'error'); return; }
+    if ((await api('cuenta_reset', { usuario: u, pass: pw })).ok) {
+      S.resetOpen = null; renderAccounts();
+      toast(`Listo. Pásale a ${orgName(u)} su contraseña temporal; al entrar crea la suya.`);
+    }
+  }
+});
+$('#f-adduser').addEventListener('submit', async e => {
+  e.preventDefault();
+  if (!isBoss()) return;
+  const err = $('#au-err'); err.hidden = true;
+  const nombre = $('#au-nombre').value.trim(), u = uname($('#au-user').value), pw = $('#au-pass').value.trim(), rol = $('#au-rol').value;
+  const fail = m => { err.textContent = m; err.hidden = false; };
+  if (nombre.length < 2) return fail('Escribe el nombre de la persona.');
+  if (u.length < 3) return fail('El usuario necesita al menos 3 letras o números, sin espacios.');
+  if (S.cuentas[u]) return fail(`El usuario ${u} ya existe.`);
+  if (pw.length < 8) return fail('La contraseña temporal necesita al menos 8 caracteres.');
+  $('#au-save').disabled = true;
+  const r = await api('cuenta_agregar', { usuario: u, nombre, pass: pw, rol });
+  $('#au-save').disabled = false;
+  if (!r.ok) return;
+  e.target.reset();
+  toast(`Listo. ${nombre} entra con el usuario ${u} y esa contraseña; al entrar crea la suya.`);
+});
+async function removeUser(btn, u) {
+  if (!isBoss() || u === me()) return;
+  if (S.removeArmed !== u) { S.removeArmed = u; renderAccounts(); setTimeout(() => { if (S.removeArmed === u) { S.removeArmed = null; renderAccounts(); } }, 4000); return; }
+  S.removeArmed = null;
+  const name = orgName(u);
+  if ((await api('cuenta_quitar', { usuario: u })).ok) toast(`Se quitó a ${name}. Ya no puede entrar a la Taquilla.`);
+  else renderAccounts();
+}
+
+/* ---------- borrar base: tres confirmaciones ---------- */
+function openWipe() {
+  if (!isBoss()) return;
+  S.wipeStep = 1; renderWipe(); openModal($('#m-wipe'));
+}
+function renderWipe() {
+  const n = S.guests.length, st = S.wipeStep;
+  [1, 2, 3].forEach(i => { const li = $('#ws-' + i); li.className = i < st ? 'done' : i === st ? 'on' : ''; });
+  const body = $('#w-body');
+  if (st === 1) body.innerHTML = `<p class="w-q">¿Estás seguro?</p><p class="muted">Vas a borrar ${n} ${n === 1 ? 'registro' : 'registros'}: solicitudes, aprobados, cobros y entradas. Las cuentas y los precios se quedan.</p>
+    <div class="row"><button class="btn" type="button" data-act="excel">Descargar Excel antes</button><button class="btn danger" type="button" data-act="wipe-next">Sí, estoy seguro</button><button class="btn ghost" type="button" data-act="close">Cancelar</button></div>`;
+  else if (st === 2) body.innerHTML = `<p class="w-q">¿Estás seguro, seguro?</p><p class="muted">No se puede deshacer. Alejandro, Andrea y quien tenga la Taquilla abierta lo ven desaparecer al instante.</p>
+    <div class="row"><button class="btn danger" type="button" data-act="wipe-next">Sí, seguro seguro</button><button class="btn ghost" type="button" data-act="close">Mejor no</button></div>`;
+  else if (st === 3) body.innerHTML = `<p class="w-q">¿Segurísimo? Última vez.</p><div class="field"><label for="w-type">Escribe BORRAR para confirmar</label><input type="text" id="w-type" autocomplete="off" autocapitalize="characters" spellcheck="false"></div><div class="field"><label for="w-pass">Tu contraseña</label><input type="password" id="w-pass" autocomplete="current-password"></div>
+    <div class="row"><button class="btn danger" type="button" data-act="wipe-go" id="w-go" disabled>Borrar todo</button><button class="btn ghost" type="button" data-act="close">Cancelar</button></div>`;
+  else body.innerHTML = `<p class="w-q" id="w-msg">Borrando…</p><div class="w-progress"><i id="w-bar"></i></div>`;
+  const ty = $('#w-type'), wp = $('#w-pass');
+  if (ty) { const chk = () => { $('#w-go').disabled = ty.value.trim().toUpperCase() !== 'BORRAR' || (S.mode !== 'demo' && wp.value.length < 1); }; ty.addEventListener('input', chk); wp.addEventListener('input', chk); setTimeout(() => ty.focus(), 30); }
+}
+async function wipeGo() {
+  if (!isBoss() || S.wipeStep !== 3 || ($('#w-type').value || '').trim().toUpperCase() !== 'BORRAR') return;
+  const pass = $('#w-pass').value, n = S.guests.length;
+  S.wipeStep = 4; renderWipe(); $('#w-bar').style.width = '60%';
+  const r = await api('borrar_base', { confirmacion: 'BORRAR', pass });
+  closeModals(); S.wipeStep = 0;
+  if (!r.ok) return;
+  toast(`Base borrada: ${n} ${n === 1 ? 'registro' : 'registros'} menos.`);
+  play('thud');
+}
+
+$('#f-me').addEventListener('submit', async e => {
+  e.preventDefault();
+  const acc = myAcc(); if (!acc) return;
+  const err = $('#me-err'); err.hidden = true;
+  const correo = $('#me-correo').value.trim(), nueva = $('#me-nueva').value, conf = $('#me-conf').value, actual = $('#me-actual').value;
+  const fail = m => { err.textContent = m; err.hidden = false; };
+  if (correo && !/^\S+@\S+\.\S+$/.test(correo)) return fail('Revisa el correo: le falta la @ o el dominio.');
+  if (nueva || conf) {
+    if (nueva.length < 8) return fail('La contraseña nueva necesita al menos 8 caracteres.');
+    if (nueva !== conf) return fail('Las dos contraseñas nuevas no son iguales.');
+  }
+  const cambiaCorreo = correo !== (acc.correo || '');
+  if (!cambiaCorreo && !nueva) { toast('No había nada que cambiar.'); return; }
+  $('#me-save').disabled = true;
+  let ok = true;
+  if (cambiaCorreo) ok = (await api('mi_correo', { correo })).ok;
+  if (ok && nueva) {
+    if (S.mode === 'demo') ok = true;
+    else {
+      try { const r = await run('cambiarPass', S.token, nueva, actual); saveToken(r.token); S.yo = r.yo; }
+      catch (x) { ok = false; fail(errCode(x) === 'ACTUAL' ? 'Tu contraseña actual no coincide.' : errMsg(x)); }
+    }
+  }
+  $('#me-save').disabled = false;
+  if (!ok) return;
+  $('#me-nueva').value = ''; $('#me-conf').value = ''; $('#me-actual').value = '';
+  toast(nueva ? 'Contraseña cambiada.' : 'Correo guardado.');
+});
+
+/* ---------- formularios ---------- */
+function setDefaults() {
+  const tipo = radio('n-tipo') || 'preventa';
+  $('#n-monto').value = priceFor(tipo);
+  $('#d-monto').value = S.config.precioPuerta;
+}
+const pubURL = () => S.url || new URL('../', location.href).href;
+const shareLink = () => S.config.link || pubURL() || 'Se muestra al conectar';
+function fillConfig() {
+  const c = S.config, f = $('#f-config');
+  $('#hdr-addr').textContent = '7:30 p.m., ' + (c.direccion || DEFAULTS.direccion);
+  $('#lnk').textContent = shareLink();
+  $('#lnk-c').textContent = pubURL() || 'Se muestra al conectar';
+  $('#pub-open').href = pubURL() || '#'; $('#eye').href = pubURL() || '#';
+  const igh = igHandle(c.ig);
+  $$('[data-link="maps"]').forEach(a => a.href = c.mapa || MAPS_URL);
+  $$('[data-link="ig"]').forEach(a => a.href = 'https://www.instagram.com/' + igh + '/');
+  const igp = cleanIg(c.igPagos) || 'tapiaandrea._';
+  $$('[data-link="igpagos"]').forEach(a => a.href = 'https://www.instagram.com/' + igp + '/');
+  $$('[data-link="sheet"]').forEach(a => { a.href = S.hoja || '#'; a.hidden = !isBoss() || !S.hoja; });
+  $('#sheet-hint').hidden = !isBoss();
+  if (!$('#f-links').contains(document.activeElement)) { $('#c-ig').value = '@' + igh; $('#c-igpagos').value = '@' + igp; $('#c-mapa').value = c.mapa || MAPS_URL; }
+  if (f.contains(document.activeElement)) return;
+  $('#c-pre').value = c.precioPreventa; $('#c-door').value = c.precioPuerta; $('#c-meta').value = c.meta ?? ''; $('#c-dir').value = c.direccion || ''; $('#c-link').value = c.link || ''; $('#c-cupo').value = c.cupo ?? '';
+  if (!$('#f-new').contains(document.activeElement)) setDefaults();
+}
+function fieldErr(sel, msg) {
+  const i = $(sel), e = $(sel + '-err');
+  i.setAttribute('aria-invalid', 'true'); if (e) { e.textContent = msg; e.hidden = false; } i.focus();
+}
+document.addEventListener('input', e => {
+  if (e.target.matches('[aria-invalid="true"]')) { e.target.removeAttribute('aria-invalid'); const er = document.getElementById(e.target.id + '-err'); if (er) er.hidden = true; }
+  if (e.target.id === 'door-q') renderDoor();
+  if (e.target.id === 'list-q') renderList();
+  if (e.target.id === 'a-monto') syncApprove();
+});
+
+$('#f-new').addEventListener('submit', async e => {
+  e.preventDefault();
+  const nombre = $('#n-nombre').value.trim(), correo = $('#n-correo').value.trim();
+  if (nombre.length < 2) return fieldErr('#n-nombre', 'Escribe el nombre de la persona.');
+  if (correo && !/^\S+@\S+\.\S+$/.test(correo)) return fieldErr('#n-correo', 'Revisa el correo: le falta la @ o el dominio.');
+  const instagram = igField('#n-ig', false); if (instagram === null) return;
+  const btn = $('#n-save'); btn.disabled = true;
+  const tipo = radio('n-tipo');
+  const body = {
+    nombre, instagram, contacto: $('#n-contacto').value.trim(), correo, disfraz: $('#n-disfraz').value.trim(), tipo, monto: Math.max(0, +$('#n-monto').value || 0),
+    pago: tipo === 'cortesia' ? 'pagado' : radio('n-pago'), metodo: radio('n-metodo'), estado: 'aprobado', origen: 'taquilla', notas: $('#n-notas').value.trim()
+  };
+  const r = await api('crear', body);
+  btn.disabled = false;
+  if (r.ok) { e.target.reset(); setDefaults(); bats(); toast(`${nombre} quedó registrado.`); if (r.g) showTicket(r.g); }
+});
+$('#f-door').addEventListener('submit', async e => {
+  e.preventDefault();
+  const btn = $('#d-save'); btn.disabled = true;
+  const r = await api('crear', { nombre: $('#d-nombre').value.trim(), tipo: 'puerta', monto: Math.max(0, +$('#d-monto').value || 0), pago: 'pagado', metodo: radio('d-metodo'), estado: 'aprobado', origen: 'puerta', entro: true });
+  btn.disabled = false;
+  if (r.ok) { $('#d-nombre').value = ''; stamp((r.g && r.g.nombre) || 'Cover'); boo(); }
+});
+const saveConfig = patch => api('config', patch).then(r => r.ok);
+$('#f-config').addEventListener('submit', async e => {
+  e.preventDefault();
+  const meta = $('#c-meta').value.trim(), cupo = $('#c-cupo').value.trim(), link = $('#c-link').value.trim();
+  if (link && !/^https:\/\//i.test(link)) { toast('El link corto debe empezar con https://', 'error'); $('#c-link').focus(); return; }
+  const c = { precioPreventa: Math.max(0, +$('#c-pre').value || 0), precioPuerta: Math.max(0, +$('#c-door').value || 0), meta: meta ? Math.max(0, +meta) : '', cupo: cupo ? Math.max(0, +cupo) : '', direccion: $('#c-dir').value.trim() || DEFAULTS.direccion, link };
+  $('#c-save').disabled = true;
+  const ok = await saveConfig(c);
+  $('#c-save').disabled = false;
+  if (ok) { document.activeElement.blur(); toast('Precios y evento guardados. La página pública ya los muestra.'); }
+});
+$('#f-links').addEventListener('submit', async e => {
+  e.preventDefault();
+  const ig = igHandle($('#c-ig').value), mapa = $('#c-mapa').value.trim();
+  if (!ig) { toast('Escribe el usuario de Instagram.', 'error'); $('#c-ig').focus(); return; }
+  const igPagos = cleanIg($('#c-igpagos').value);
+  if (!igOk(igPagos)) { toast('Revisa el Instagram que recibe los comprobantes.', 'error'); $('#c-igpagos').focus(); return; }
+  if (mapa && !/^https:\/\//i.test(mapa)) { toast('El link de Google Maps debe empezar con https://', 'error'); $('#c-mapa').focus(); return; }
+  $('#l-save').disabled = true;
+  const ok = await saveConfig({ ig, igPagos, mapa: mapa || MAPS_URL });
+  $('#l-save').disabled = false;
+  if (ok) { document.activeElement.blur(); toast('Links guardados.'); }
+});
+$('#b-lnk').addEventListener('click', () => copyText(shareLink(), 'Link copiado. Pégalo en tu historia o en la bio.'));
+
+/* editar */
+let editId = null;
+function openEdit(id) {
+  const g = byId(id); if (!g) return; editId = id;
+  $('#e-nombre').value = g.nombre || ''; $('#e-contacto').value = g.contacto || ''; $('#e-correo').value = g.correo || '';
+  $('#e-ig').value = g.instagram || ''; $('#e-comp').checked = !!g.comprobante;
+  $('#e-comp-who').textContent = g.comprobante && g.comprobantePor ? `(lo marcó ${orgName(g.comprobantePor)} ${dm(g.comprobanteEn)} ${tm(g.comprobanteEn)})` : '';
+  $('#e-tipo').value = g.tipo || 'preventa'; $('#e-estado').value = est(g); $('#e-monto').value = g.monto ?? 0; $('#e-pago').value = g.pago || 'pagado';
+  $('#e-metodo').value = g.metodo || 'transferencia'; $('#e-notas').value = g.notas || ''; $('#e-disfraz').value = g.disfraz || '';
+  const d = $('#e-del'); d.dataset.armed = '0'; d.textContent = 'Eliminar';
+  openModal($('#m-edit'));
+}
+$('#f-edit').addEventListener('submit', async e => {
+  e.preventDefault();
+  const nombre = $('#e-nombre').value.trim(); if (nombre.length < 2) return fieldErr('#e-nombre', 'Escribe el nombre de la persona.');
+  const instagram = igField('#e-ig', false); if (instagram === null) return;
+  const g = byId(editId); if (!g || busy.has(editId)) return;
+  busy.add(editId);
+  const wantComp = $('#e-comp').checked;
+  if (wantComp !== !!g.comprobante) { const c = await api('comprobante', { id: editId, valor: wantComp }); if (!c.ok) { busy.delete(editId); return; } }
+  const patch = { id: editId, nombre, instagram, contacto: $('#e-contacto').value.trim(), correo: $('#e-correo').value.trim(), tipo: $('#e-tipo').value, estado: $('#e-estado').value, monto: Math.max(0, +$('#e-monto').value || 0), pago: $('#e-pago').value, metodo: $('#e-metodo').value, notas: $('#e-notas').value.trim(), disfraz: $('#e-disfraz').value.trim() };
+  const r = await api('editar', patch);
+  busy.delete(editId);
+  if (r.ok) { closeModals(); toast('Cambios guardados.'); }
+});
+$('#e-del').addEventListener('click', async () => {
+  const d = $('#e-del'), g = byId(editId); if (!g) return;
+  if (d.dataset.armed !== '1') { d.dataset.armed = '1'; d.textContent = `Sí, eliminar a ${g.nombre}`; return; }
+  const r = await api('eliminar', { id: editId });
+  if (r.ok) { closeModals(); toast(`${g.nombre} se eliminó de la lista.`); }
+});
+
+/* ---------- boleto ---------- */
+let ticketG = null;
+function ticketMsg(g) {
+  const dir = S.config.direccion || DEFAULTS.direccion;
+  const head = g.tipo === 'cortesia' ? `¡Hola, ${g.nombre}! Tienes pase de cortesía para BUULLAKEO.`
+    : g.tipo === 'asistencia' ? (g.pago === 'pagado' ? `¡Listo, ${g.nombre}! Tu asistencia a BUULLAKEO quedó confirmada y tu cover pagado.` : `¡Listo, ${g.nombre}! Tu asistencia a BUULLAKEO quedó confirmada. El cover de ${money(g.monto)} lo pagas en la puerta.`)
+    : g.tipo === 'puerta' ? `¡Gracias, ${g.nombre}! Tu cover para BUULLAKEO quedó pagado.`
+    : g.pago === 'pendiente' ? `¡Hola, ${g.nombre}! Te apartamos lugar para BUULLAKEO. Te falta pagar ${money(g.monto)}.`
+    : `¡Listo, ${g.nombre}! Tu preventa para BUULLAKEO quedó confirmada.`;
+  return `${head}\nCódigo: ${g.codigo}\nSábado 24 de octubre, 7:30 p.m.\n${dir}\nCómo llegar: ${S.config.mapa || MAPS_URL}\nDudas: instagram.com/${igHandle(S.config.ig)}\nMuestra este boleto o tu código en la entrada.`;
+}
+function ticketStatus(g) {
+  if (g.tipo === 'cortesia') return ['PASE DE CORTESÍA', '#ff7a1a'];
+  if (g.tipo === 'puerta') return ['COVER PAGADO', '#ff7a1a'];
+  if (g.tipo === 'asistencia') return g.pago === 'pagado' ? ['ASISTENCIA CONFIRMADA, COVER PAGADO', '#ff7a1a'] : [`ASISTENCIA CONFIRMADA, COVER ${money(g.monto)} EN PUERTA`, '#ffc35c'];
+  if (g.pago === 'pendiente') return ['LUGAR APARTADO, PAGO PENDIENTE', '#ffc35c'];
+  return ['PREVENTA CONFIRMADA', '#ff7a1a'];
+}
+async function showTicket(g) {
+  if (!g.codigo) { toast('Primero aprueba la solicitud para crear su boleto.'); return; }
+  ticketG = g;
+  $('#mt-title').textContent = 'Boleto de ' + g.nombre;
+  $('#t-msg').value = ticketMsg(g);
+  $('#t-hint').hidden = true;
+  $('#t-img').removeAttribute('src');
+  openModal($('#m-ticket'));
+  await drawTicket(g);
+  $('#t-img').src = $('#t-canvas').toDataURL('image/png');
+}
+function copiaVieja(text) {
+  const ta = document.createElement('textarea'); ta.value = text; ta.setAttribute('readonly', '');
+  ta.style.cssText = 'position:fixed;top:0;left:0;opacity:0;pointer-events:none';
+  document.body.appendChild(ta); ta.select(); ta.setSelectionRange(0, text.length);
+  let ok = false; try { ok = document.execCommand('copy'); } catch (e) {}
+  ta.remove(); return ok;
+}
+async function copyText(text, okMsg, fallbackEl) {
+  if (copiaVieja(text)) { toast(okMsg); return; }
+  try { await navigator.clipboard.writeText(text); toast(okMsg); }
+  catch (e) { if (fallbackEl) { fallbackEl.focus(); fallbackEl.select(); toast('Selecciona el texto y cópialo.'); } else toast('No se pudo copiar. Mantén presionado el texto para copiarlo.', 'error'); }
+}
+$('#t-copy').addEventListener('click', () => copyText($('#t-msg').value, 'Mensaje copiado. Pégalo en el DM.', $('#t-msg')));
+$('#t-dl').addEventListener('click', () => {
+  if (!ticketG) return;
+  const cv = $('#t-canvas');
+  $('#t-hint').hidden = false;
+  cv.toBlob(b => saveFile(`boleto-${ticketG.codigo}.png`, b, 'Boleto descargado.'), 'image/png');
+});
+
+function fitFont(ctx, text, weight, size, family, maxW) {
+  let s = size; ctx.font = `${weight} ${s}px ${family}`;
+  while (ctx.measureText(text).width > maxW && s > 20) { s -= 4; ctx.font = `${weight} ${s}px ${family}`; }
+  return s;
+}
+function rr(ctx, x, y, w, h, r) { ctx.beginPath(); ctx.moveTo(x + r, y); ctx.arcTo(x + w, y, x + w, y + h, r); ctx.arcTo(x + w, y + h, x, y + h, r); ctx.arcTo(x, y + h, x, y, r); ctx.arcTo(x, y, x + w, y, r); ctx.closePath(); }
+async function drawTicket(g) {
+  const cv = $('#t-canvas'), ctx = cv.getContext('2d'), W = 1080, H = 1920;
+  const ANTON = 'Anton, Impact, sans-serif', MARK = 'Creepster, Impact, fantasy', BODY = '"Barlow Semi Condensed", "Arial Narrow", sans-serif';
+  try { await Promise.all(['100px Anton', '100px Creepster', '600 40px "Barlow Semi Condensed"', '400 40px "Barlow Semi Condensed"'].map(f => document.fonts.load(f))); } catch (e) {}
+  ctx.clearRect(0, 0, W, H);
+  ctx.fillStyle = '#120d0a'; ctx.fillRect(0, 0, W, H);
+  const halo = ctx.createRadialGradient(540, 800, 40, 540, 800, 860);
+  halo.addColorStop(0, 'rgba(255,122,26,.30)'); halo.addColorStop(1, 'rgba(255,122,26,0)');
+  ctx.fillStyle = halo; ctx.fillRect(0, 0, W, H);
+  let sd = 5; const r = () => (sd = (sd * 16807) % 2147483647) / 2147483647;
+  for (let i = 0; i < 1800; i++) { ctx.fillStyle = `rgba(255,240,220,${r() * 0.04})`; ctx.fillRect(r() * W, r() * H, 2, 2); }
+  drawWeb(ctx, 0, 0, 340, 1, 1, 'rgba(255,122,26,.85)', 3);
+  drawWeb(ctx, W, 0, 340, -1, 1, 'rgba(255,122,26,.85)', 3);
+  ctx.strokeStyle = 'rgba(244,235,223,.38)'; ctx.lineWidth = 3; ctx.strokeRect(70, 150, W - 140, H - 300);
+  ctx.save(); ctx.fillStyle = '#f4ebdf'; ctx.font = `400 38px ${ANTON}`; ctx.textAlign = 'center';
+  ctx.translate(118, H / 2); ctx.rotate(-Math.PI / 2); ctx.fillText('LA PEDA CASERA QUE ESTABAS ESPERANDO', 0, 0); ctx.restore();
+  ctx.save(); ctx.fillStyle = '#f4ebdf'; ctx.font = `400 38px ${ANTON}`; ctx.textAlign = 'center';
+  ctx.translate(W - 118, H / 2); ctx.rotate(Math.PI / 2); ctx.fillText('ASISTENCIA CONFIRMADA', 0, 0); ctx.restore();
+  ctx.textAlign = 'center'; ctx.fillStyle = '#f4ebdf';
+  ctx.font = `400 124px ${ANTON}`; ctx.fillText('24 OCTUBRE', 540, 330); ctx.fillText('7:30 P.M.', 540, 466);
+  drawPumpkin(ctx, 540, 800, 255, 1, 0);
+  const ms = fitFont(ctx, 'BUULLAKEO', 400, 176, MARK, 800);
+  ctx.lineJoin = 'round'; ctx.lineWidth = Math.round(ms / 12); ctx.strokeStyle = '#120d0a';
+  ctx.strokeText('BUULLAKEO', 540, 860); ctx.fillStyle = '#f7f1e9'; ctx.fillText('BUULLAKEO', 540, 860);
+  const [status, scol] = ticketStatus(g);
+  ctx.fillStyle = scol; fitFont(ctx, status, 700, 46, BODY, 760); ctx.fillText(status, 540, 1150);
+  ctx.fillStyle = '#f4ebdf'; fitFont(ctx, g.nombre.toUpperCase(), 400, 104, ANTON, 720); ctx.fillText(g.nombre.toUpperCase(), 540, 1262);
+  rr(ctx, 170, 1310, 740, 300, 28); ctx.fillStyle = 'rgba(244,235,223,.06)'; ctx.fill(); ctx.strokeStyle = 'rgba(244,235,223,.25)'; ctx.lineWidth = 2; ctx.stroke();
+  let tx = 540, align = 'center';
+  if (window.QRious) {
+    try {
+      const qc = document.createElement('canvas');
+      new window.QRious({ element: qc, value: `BUULLAKEO|${g.codigo}|${norm(g.nombre).replace(/[^a-z0-9 ]/g, '')}`, size: 232, level: 'M', background: '#ffffff', foreground: '#120d0a', padding: 8 });
+      rr(ctx, 200, 1340, 240, 240, 16); ctx.fillStyle = '#ffffff'; ctx.fill();
+      ctx.drawImage(qc, 204, 1344, 232, 232);
+      tx = 480; align = 'left';
+    } catch (e) {}
+  }
+  ctx.textAlign = align;
+  ctx.fillStyle = '#b5a594'; ctx.font = `600 38px ${BODY}`; ctx.fillText('Código', tx, 1408);
+  ctx.fillStyle = '#ff7a1a'; fitFont(ctx, g.codigo, 400, 108, ANTON, align === 'left' ? 400 : 640); ctx.fillText(g.codigo, tx, 1520);
+  ctx.fillStyle = '#f4ebdf'; ctx.font = `500 34px ${BODY}`; ctx.fillText('Muéstralo en la entrada', tx, 1572);
+  ctx.textAlign = 'center';
+  const dir = (S.config.direccion || DEFAULTS.direccion).toUpperCase();
+  ctx.fillStyle = '#f4ebdf'; fitFont(ctx, dir, 400, 50, ANTON, 760); ctx.fillText(dir, 540, 1690);
+  ctx.fillStyle = '#b5a594'; ctx.font = `500 34px ${BODY}`; ctx.fillText('DJ en vivo   /   Rifa de botella al mejor disfraz', 540, 1742);
+  ctx.font = `500 28px ${BODY}`; ctx.fillText('Boleto personal, válido para una entrada', 540, 1840);
+}
+
+/* ---------- kit para compartir ---------- */
+const FONTS = { ANTON: 'Anton, Impact, sans-serif', MARK: 'Creepster, Impact, fantasy', BODY: '"Barlow Semi Condensed", "Arial Narrow", sans-serif' };
+async function fontsReady() { try { await Promise.all(['100px Anton', '100px Creepster', '600 40px "Barlow Semi Condensed"'].map(f => document.fonts.load(f))); } catch (e) {} }
+function shareBase(ctx, W, H, cy, web) {
+  ctx.clearRect(0, 0, W, H); ctx.fillStyle = '#120d0a'; ctx.fillRect(0, 0, W, H);
+  const halo = ctx.createRadialGradient(W / 2, cy, 40, W / 2, cy, Math.max(W, H) * .5);
+  halo.addColorStop(0, 'rgba(255,122,26,.32)'); halo.addColorStop(1, 'rgba(255,122,26,0)');
+  ctx.fillStyle = halo; ctx.fillRect(0, 0, W, H);
+  let sd = 9; const r = () => (sd = (sd * 16807) % 2147483647) / 2147483647;
+  for (let i = 0; i < W * H / 1150; i++) { ctx.fillStyle = `rgba(255,240,220,${r() * .04})`; ctx.fillRect(r() * W, r() * H, 2, 2); }
+  drawWeb(ctx, 0, 0, web, 1, 1, 'rgba(255,122,26,.85)', 3);
+  drawWeb(ctx, W, 0, web, -1, 1, 'rgba(255,122,26,.85)', 3);
+}
+function markText(ctx, text, x, y, size, maxW) {
+  const ms = fitFont(ctx, text, 400, size, FONTS.MARK, maxW);
+  ctx.lineJoin = 'round'; ctx.lineWidth = Math.round(ms / 12); ctx.strokeStyle = '#120d0a';
+  ctx.strokeText(text, x, y); ctx.fillStyle = '#f7f1e9'; ctx.fillText(text, x, y);
+}
+function qrInto(ctx, x, y, size) {
+  const link = shareLink();
+  rr(ctx, x - 14, y - 14, size + 28, size + 28, 22); ctx.fillStyle = '#ffffff'; ctx.fill();
+  if (!window.QRious) { ctx.fillStyle = '#120d0a'; ctx.font = `600 28px ${FONTS.BODY}`; ctx.textAlign = 'center'; ctx.fillText('QR no disponible', x + size / 2, y + size / 2); return; }
+  const qc = document.createElement('canvas');
+  new window.QRious({ element: qc, value: link, size, level: 'M', background: '#ffffff', foreground: '#120d0a', padding: 0 });
+  ctx.drawImage(qc, x, y, size, size);
+}
+function sideTexts(ctx, W, H, x) {
+  ctx.save(); ctx.fillStyle = '#f4ebdf'; ctx.font = `400 36px ${FONTS.ANTON}`; ctx.textAlign = 'center';
+  ctx.translate(x, H / 2); ctx.rotate(-Math.PI / 2); ctx.fillText('LA PEDA CASERA QUE ESTABAS ESPERANDO', 0, 0); ctx.restore();
+  ctx.save(); ctx.fillStyle = '#f4ebdf'; ctx.font = `400 36px ${FONTS.ANTON}`; ctx.textAlign = 'center';
+  ctx.translate(W - x, H / 2); ctx.rotate(Math.PI / 2); ctx.fillText('CONFIRMA TU ASISTENCIA', 0, 0); ctx.restore();
+}
+function drawShare(kind) {
+  const cv = $('#sk-canvas'), ctx = cv.getContext('2d');
+  const pre = money(S.config.precioPreventa), cov = money(S.config.precioPuerta), dir = (S.config.direccion || DEFAULTS.direccion).toUpperCase();
+  const { ANTON, BODY } = FONTS;
+  if (kind === 'story') {
+    const W = 1080, H = 1920; cv.width = W; cv.height = H;
+    shareBase(ctx, W, H, 780, 320);
+    ctx.strokeStyle = 'rgba(244,235,223,.38)'; ctx.lineWidth = 3; ctx.strokeRect(70, 210, W - 140, 1500);
+    sideTexts(ctx, W, H, 116);
+    ctx.textAlign = 'center'; ctx.fillStyle = '#f4ebdf'; ctx.font = `400 120px ${ANTON}`;
+    ctx.fillText('24 OCTUBRE', 540, 390); ctx.fillText('7:30 P.M.', 540, 520);
+    drawPumpkin(ctx, 540, 820, 240, 1, 0); markText(ctx, 'BUULLAKEO', 540, 880, 170, 800);
+    ctx.fillStyle = '#b5a594'; fitFont(ctx, 'DJ EN VIVO  ·  RIFA DE BOTELLA AL MEJOR DISFRAZ', 600, 34, BODY, 760); ctx.fillText('DJ EN VIVO  ·  RIFA DE BOTELLA AL MEJOR DISFRAZ', 540, 1135);
+    ctx.fillStyle = '#ff7a1a'; fitFont(ctx, `PREVENTA ${pre}   ·   COVER ${cov}`, 400, 66, ANTON, 780); ctx.fillText(`PREVENTA ${pre}   ·   COVER ${cov}`, 540, 1225);
+    ctx.fillStyle = '#f4ebdf'; ctx.font = `400 92px ${ANTON}`; ctx.fillText('CONFIRMA TU LUGAR', 540, 1370);
+    ctx.strokeStyle = '#ff7a1a'; ctx.lineWidth = 8; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+    [1405, 1440].forEach(y => { ctx.beginPath(); ctx.moveTo(505, y); ctx.lineTo(540, y + 26); ctx.lineTo(575, y); ctx.stroke(); });
+    const g = ctx.createRadialGradient(540, 1555, 10, 540, 1555, 330);
+    g.addColorStop(0, 'rgba(255,122,26,.42)'); g.addColorStop(1, 'rgba(255,122,26,0)');
+    ctx.save(); ctx.translate(540, 1555); ctx.scale(1, .32); ctx.translate(-540, -1555); ctx.fillStyle = g; ctx.beginPath(); ctx.arc(540, 1555, 330, 0, Math.PI * 2); ctx.fill(); ctx.restore();
+    ctx.fillStyle = '#ff7a1a'; fitFont(ctx, dir, 400, 46, ANTON, 760); ctx.fillText(dir, 540, 1670);
+  } else if (kind === 'post') {
+    const W = 1080, H = 1350; cv.width = W; cv.height = H;
+    shareBase(ctx, W, H, 520, 250);
+    ctx.strokeStyle = 'rgba(244,235,223,.38)'; ctx.lineWidth = 3; ctx.strokeRect(60, 60, W - 120, H - 120);
+    ctx.textAlign = 'center'; ctx.fillStyle = '#f4ebdf'; ctx.font = `400 84px ${ANTON}`; ctx.fillText('24 OCTUBRE  ·  7:30 P.M.', 540, 215);
+    drawPumpkin(ctx, 540, 530, 185, 1, 0); markText(ctx, 'BUULLAKEO', 540, 580, 140, 760);
+    ctx.fillStyle = '#ff7a1a'; fitFont(ctx, `PREVENTA ${pre}   ·   COVER ${cov}`, 400, 56, ANTON, 800); ctx.fillText(`PREVENTA ${pre}   ·   COVER ${cov}`, 540, 812);
+    ctx.fillStyle = '#b5a594'; fitFont(ctx, 'DJ EN VIVO  ·  RIFA DE BOTELLA AL MEJOR DISFRAZ', 600, 30, BODY, 800); ctx.fillText('DJ EN VIVO  ·  RIFA DE BOTELLA AL MEJOR DISFRAZ', 540, 865);
+    qrInto(ctx, 150, 945, 250);
+    ctx.textAlign = 'left'; ctx.fillStyle = '#f4ebdf'; ctx.font = `400 74px ${ANTON}`; ctx.fillText('ESCANEA', 470, 1030);
+    ctx.fillStyle = '#ff7a1a'; ctx.fillText('Y CONFIRMA', 470, 1110);
+    ctx.fillStyle = '#b5a594'; ctx.font = `600 32px ${BODY}`; ctx.fillText('o entra al link de la bio', 472, 1162);
+    ctx.fillStyle = '#f4ebdf'; fitFont(ctx, dir, 400, 30, ANTON, 470); ctx.fillText(dir, 472, 1212);
+  } else {
+    const W = 1080, H = 1080; cv.width = W; cv.height = H;
+    shareBase(ctx, W, H, 560, 210);
+    ctx.textAlign = 'center';
+    ctx.save(); ctx.shadowColor = 'rgba(255,122,26,.7)'; ctx.shadowBlur = 30; markText(ctx, 'BUULLAKEO', 540, 185, 130, 760); ctx.restore();
+    ctx.fillStyle = '#ff7a1a'; ctx.font = `400 50px ${ANTON}`; ctx.fillText('SÁBADO 24 OCT  ·  7:30 P.M.', 540, 262);
+    qrInto(ctx, 290, 320, 500);
+    ctx.fillStyle = '#f4ebdf'; ctx.font = `400 60px ${ANTON}`; ctx.fillText('ESCANEA PARA CONFIRMAR', 540, 945);
+    ctx.fillStyle = '#b5a594'; fitFont(ctx, `${S.config.direccion || DEFAULTS.direccion}  ·  Preventa ${pre}`, 600, 32, BODY, 900); ctx.fillText(`${S.config.direccion || DEFAULTS.direccion}  ·  Preventa ${pre}`, 540, 1000);
+  }
+  return cv;
+}
+function shareTexts() {
+  const link = shareLink(), pre = money(S.config.precioPreventa), cov = money(S.config.precioPuerta), dir = S.config.direccion || DEFAULTS.direccion;
+  $('#sk-t-post').value = `🎃 BUULLAKEO 🎃\nLa peda casera que estabas esperando.\n\nSábado 24 de octubre · 7:30 p.m.\nDJ en vivo y rifa de botella al mejor disfraz.\nPreventa ${pre} · Cover ${cov}\n\nPide tu lugar aquí 👉 ${link}`;
+  $('#sk-t-wa').value = `¡Ya hay fecha! 🎃 BUULLAKEO, la peda casera que estabas esperando.\n📅 Sábado 24 de octubre, 7:30 p.m.\n📍 ${dir}\n🎧 DJ en vivo y rifa de botella al mejor disfraz\n🎟️ Preventa ${pre} (cover ${cov} en puerta)\n\nPide tu lugar aquí, solo pones tu nombre:\n${link}`;
+  $('#sk-t-bio').value = `🎃 BUULLAKEO · Sáb 24 oct, 7:30 p.m.\nConfirma tu lugar 👇\n${link}`;
+}
+let shareSig = '', shareBusy = false;
+async function renderShare(force) {
+  if (!live() || S.tab !== 'control' || shareBusy) return;
+  const sig = [S.config.link, S.config.precioPreventa, S.config.precioPuerta, S.config.direccion].join('|');
+  if (!force && sig === shareSig) return;
+  shareBusy = true; shareSig = sig;
+  shareTexts();
+  await fontsReady();
+  for (const k of ['story', 'post', 'qr']) {
+    const cv = drawShare(k);
+    $('#sk-' + k).src = cv.toDataURL('image/jpeg', .82);
+    await new Promise(r => setTimeout(r, 0));
+  }
+  shareBusy = false;
+}
+async function shareDownload(kind) {
+  await fontsReady();
+  const cv = drawShare(kind), name = { story: 'historia', post: 'post-qr', qr: 'qr-imprimir' }[kind];
+  cv.toBlob(b => saveFile(`buullakeo-${name}.png`, b, 'Imagen descargada. Si no aparece, mantén presionada la imagen para guardarla.'), 'image/png');
+}
+
+/* ---------- dibujo ---------- */
+function drawWeb(ctx, x, y, size, dx, dy, color, lw) {
+  ctx.save(); ctx.translate(x, y); ctx.scale(dx, dy); ctx.strokeStyle = color; ctx.lineWidth = lw; ctx.lineCap = 'round';
+  const N = 7, angs = Array.from({ length: N }, (_, i) => (Math.PI / 2) * i / (N - 1));
+  angs.forEach(a => { ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(Math.cos(a) * size, Math.sin(a) * size); ctx.stroke(); });
+  for (let k = 1; k <= 5; k++) {
+    const rad = size * k / 5.5; ctx.beginPath();
+    angs.forEach((a, i) => {
+      const px = Math.cos(a) * rad, py = Math.sin(a) * rad;
+      if (!i) ctx.moveTo(px, py); else { const am = (angs[i - 1] + a) / 2, sg = rad * 0.84; ctx.quadraticCurveTo(Math.cos(am) * sg, Math.sin(am) * sg, px, py); }
+    });
+    ctx.stroke();
+  }
+  ctx.restore();
+}
+function facePath(ctx, cx, cy, r) {
+  ctx.beginPath();
+  ctx.moveTo(cx - r * .48, cy - r * .06); ctx.lineTo(cx - r * .12, cy - r * .15); ctx.lineTo(cx - r * .30, cy - r * .44); ctx.closePath();
+  ctx.moveTo(cx + r * .48, cy - r * .06); ctx.lineTo(cx + r * .12, cy - r * .15); ctx.lineTo(cx + r * .30, cy - r * .44); ctx.closePath();
+  ctx.moveTo(cx, cy - r * .07); ctx.lineTo(cx + r * .07, cy + r * .06); ctx.lineTo(cx - r * .07, cy + r * .06); ctx.closePath();
+  ctx.moveTo(cx - r * .60, cy + r * .12);
+  [[-.42, .23], [-.33, .14], [-.19, .25], [-.08, .16], [.06, .26], [.17, .16], [.31, .25], [.41, .14], [.60, .12]].forEach(([a, b]) => ctx.lineTo(cx + r * a, cy + r * b));
+  ctx.quadraticCurveTo(cx + r * .42, cy + r * .62, cx + r * .02, cy + r * .61);
+  ctx.lineTo(cx - r * .09, cy + r * .48); ctx.lineTo(cx - r * .19, cy + r * .58);
+  ctx.quadraticCurveTo(cx - r * .44, cy + r * .54, cx - r * .60, cy + r * .12);
+  ctx.closePath();
+}
+function drawPumpkin(ctx, cx, cy, r, glow, t) {
+  const flick = reduced || !t ? 1 : 0.86 + 0.08 * Math.sin(t / 90) + 0.06 * Math.sin(t / 37 + 1.3);
+  const g = Math.max(0.07, Math.min(1, glow)) * flick;
+  ctx.save();
+  const halo = ctx.createRadialGradient(cx, cy, r * .2, cx, cy, r * 1.6);
+  halo.addColorStop(0, `rgba(255,122,26,${0.42 * g})`); halo.addColorStop(1, 'rgba(255,122,26,0)');
+  ctx.fillStyle = halo; ctx.fillRect(cx - r * 1.7, cy - r * 1.7, r * 3.4, r * 3.4);
+  ctx.fillStyle = '#4e3421';
+  ctx.beginPath(); ctx.moveTo(cx - r * .09, cy - r * .7); ctx.quadraticCurveTo(cx - r * .12, cy - r * .98, cx + r * .02, cy - r * 1.08);
+  ctx.lineTo(cx + r * .15, cy - r * 1.01); ctx.quadraticCurveTo(cx + r * .05, cy - r * .92, cx + r * .1, cy - r * .7); ctx.closePath(); ctx.fill();
+  [[-.56, .46, '#b0430b'], [.56, .46, '#b0430b'], [-.29, .52, '#dc5d0f'], [.29, .52, '#dc5d0f'], [0, .5, '#f0721a']].forEach(([ox, w, col]) => {
+    const gx = cx + ox * r, gr = ctx.createRadialGradient(gx - w * r * .3, cy - r * .38, r * .04, gx, cy, r * .95);
+    gr.addColorStop(0, '#ffa24c'); gr.addColorStop(.55, col); gr.addColorStop(1, '#561e04');
+    ctx.fillStyle = gr; ctx.beginPath(); ctx.ellipse(gx, cy, w * r, r * .82, 0, 0, Math.PI * 2); ctx.fill();
+  });
+  ctx.fillStyle = '#2a1006'; facePath(ctx, cx, cy, r); ctx.fill();
+  const fg = ctx.createRadialGradient(cx, cy + r * .1, r * .05, cx, cy, r * .8);
+  fg.addColorStop(0, `rgba(255,244,180,${g})`); fg.addColorStop(.45, `rgba(255,196,86,${g})`); fg.addColorStop(1, `rgba(255,122,30,${g})`);
+  ctx.fillStyle = fg; ctx.shadowColor = `rgba(255,170,60,${g})`; ctx.shadowBlur = r * .25 * g; facePath(ctx, cx, cy, r); ctx.fill();
+  ctx.restore();
+}
+let pumpGlow = 0, lastT = 0, pumpOn = false;
+function drawPanelPumpkin(t) {
+  const cv = $('#pumpkin'); if (!cv) return;
+  const ctx = cv.getContext('2d');
+  if (reduced) pumpGlow = pumpTarget;
+  ctx.clearRect(0, 0, cv.width, cv.height);
+  drawPumpkin(ctx, cv.width / 2, cv.height / 2 + 24, 130, pumpGlow, t);
+}
+function startPumpkin() {
+  if (reduced) { drawPanelPumpkin(0); return; }
+  if (pumpOn) return; pumpOn = true;
+  const loop = t => {
+    requestAnimationFrame(loop);
+    if (S.tab !== 'panel' || !live() || document.hidden || t - lastT < 45) return;
+    lastT = t; pumpGlow += (pumpTarget - pumpGlow) * 0.06; drawPanelPumpkin(t);
+  };
+  requestAnimationFrame(loop);
+}
+
+/* ---------- avisos ---------- */
+let toastT = 0;
+function toast(msg, kind) {
+  const el = $('#toast'); el.textContent = msg; el.dataset.kind = kind || ''; el.hidden = false;
+  clearTimeout(toastT); toastT = setTimeout(() => el.hidden = true, 3600);
+}
+let aprT = 0;
+function approvedStamp(name) {
+  const el = $('#apr'); $('#apr-name').textContent = name;
+  el.hidden = true; void el.offsetWidth; el.hidden = false;
+  const ink = el.querySelector('.ink'); ink.style.animation = 'none'; void ink.offsetWidth; ink.style.animation = '';
+  const m = $('#app'); m.classList.remove('thump'); void m.offsetWidth; m.classList.add('thump');
+  if (S.sound) Snd.thud();
+  clearTimeout(aprT); aprT = setTimeout(() => { el.hidden = true; m.classList.remove('thump'); }, reduced ? 900 : 1600);
+}
+let stampT = 0;
+function stamp(name) {
+  const el = $('#stamp'); $('#stamp-name').textContent = name + ' ya está adentro';
+  el.hidden = true; void el.offsetWidth; el.hidden = false;
+  const inner = el.querySelector('.s-in'); inner.style.animation = 'none'; void inner.offsetWidth; inner.style.animation = '';
+  clearTimeout(stampT); stampT = setTimeout(() => el.hidden = true, reduced ? 1000 : 1400);
+}
+/* ---------- motor de sonido (sintetizado, sin archivos) ---------- */
+const Snd = (() => {
+  const AC = window.AudioContext || window.webkitAudioContext;
+  let a = null, master = null, verb = null, drn = null;
+  function ctx() {
+    if (!AC) return null;
+    try {
+      if (!a) {
+        a = new AC();
+        const comp = a.createDynamicsCompressor(); comp.threshold.value = -16; comp.ratio.value = 5;
+        master = a.createGain(); master.gain.value = .85; master.connect(comp); comp.connect(a.destination);
+        verb = a.createConvolver(); verb.buffer = impulse(3, 2.4);
+        const wet = a.createGain(); wet.gain.value = .55; verb.connect(wet); wet.connect(master);
+      }
+      if (a.state === 'suspended') a.resume();
+      return a;
+    } catch (e) { return null; }
+  }
+  function impulse(sec, decay) {
+    const n = Math.floor(a.sampleRate * sec), b = a.createBuffer(2, n, a.sampleRate);
+    for (let c = 0; c < 2; c++) { const d = b.getChannelData(c); for (let i = 0; i < n; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / n, decay); }
+    return b;
+  }
+  function bus(wetAmt) {
+    const g = a.createGain(); g.connect(master);
+    if (wetAmt) { const w = a.createGain(); w.gain.value = wetAmt; g.connect(w); w.connect(verb); }
+    return g;
+  }
+  function noise(sec) {
+    const n = Math.max(1, Math.floor(a.sampleRate * sec)), b = a.createBuffer(1, n, a.sampleRate), d = b.getChannelData(0);
+    for (let i = 0; i < n; i++) d[i] = Math.random() * 2 - 1;
+    const s = a.createBufferSource(); s.buffer = b; return s;
+  }
+  function env(p, t, peak, att, rel) { p.setValueAtTime(.0001, t); p.exponentialRampToValueAtTime(peak, t + att); p.exponentialRampToValueAtTime(.0001, t + att + rel); }
+  function tone(type, f, t, out, peak, att, rel) {
+    const o = a.createOscillator(), g = a.createGain();
+    o.type = type; o.frequency.setValueAtTime(f, t); env(g.gain, t, peak, att, rel);
+    o.connect(g); g.connect(out); o.start(t); o.stop(t + att + rel + .05); return o;
+  }
+  const api = {
+    /* toc toc en madera */
+    knock() {
+      if (!ctx()) return; const t = a.currentTime, out = bus(.3);
+      [0, .17].forEach(d => {
+        const o = tone('sine', 180, t + d, out, .8, .004, .17); o.frequency.exponentialRampToValueAtTime(55, t + d + .16);
+        const n = noise(.06), f = a.createBiquadFilter(), g = a.createGain();
+        f.type = 'bandpass'; f.frequency.value = 1100; f.Q.value = 2; env(g.gain, t + d, .4, .002, .05);
+        n.connect(f); f.connect(g); g.connect(out); n.start(t + d);
+      });
+    },
+    /* golpe de cuerdas de película de terror */
+    stab() {
+      if (!ctx()) return; const t = a.currentTime, out = bus(.7), lp = a.createBiquadFilter();
+      lp.type = 'lowpass'; lp.frequency.setValueAtTime(5000, t); lp.frequency.exponentialRampToValueAtTime(600, t + 1.4); lp.connect(out);
+      [233.08, 329.63, 349.23, 466.16, 698.46].forEach((f, i) => [-9, 9].forEach(dt => { const o = tone('sawtooth', f, t, lp, .06, .006, 1.4); o.detune.value = dt + i * 4; }));
+    },
+    /* grito + caída de bajo + cuerdas */
+    scream() {
+      if (!ctx()) return; const t = a.currentTime, out = bus(.55);
+      [[1400, 420, .9], [2500, 950, .5], [3400, 1700, .35]].forEach(([f0, f1, pk]) => {
+        const n = noise(1.1), bp = a.createBiquadFilter(), g = a.createGain();
+        bp.type = 'bandpass'; bp.Q.value = 10; bp.frequency.setValueAtTime(f0, t); bp.frequency.exponentialRampToValueAtTime(f1, t + 1);
+        env(g.gain, t, pk, .02, .95); n.connect(bp); bp.connect(g); g.connect(out); n.start(t);
+      });
+      const sub = tone('sine', 120, t, out, .9, .01, 1); sub.frequency.exponentialRampToValueAtTime(30, t + 1);
+      api.stab();
+    },
+    /* trueno lejano */
+    thunder(delay) {
+      if (!ctx()) return; const t = a.currentTime + (delay || 0), out = bus(.6), n = noise(3.2), lp = a.createBiquadFilter(), g = a.createGain();
+      lp.type = 'lowpass'; lp.frequency.setValueAtTime(1000, t); lp.frequency.exponentialRampToValueAtTime(110, t + 2.8);
+      g.gain.setValueAtTime(.0001, t); g.gain.exponentialRampToValueAtTime(.8, t + .04); g.gain.exponentialRampToValueAtTime(.2, t + .45);
+      g.gain.exponentialRampToValueAtTime(.55, t + .8); g.gain.exponentialRampToValueAtTime(.0001, t + 3.1);
+      n.connect(lp); lp.connect(g); g.connect(out); n.start(t);
+    },
+    /* campana de iglesia vieja */
+    bell(f) {
+      if (!ctx()) return; const t = a.currentTime, out = bus(.6), b = f || 523.25;
+      [[1, .28, 2.4], [2.76, .1, 1.5], [5.4, .05, .9], [.5, .16, 2.8], [1.5, .06, 1.2]].forEach(([m, p, r]) => tone('sine', b * m, t, out, p, .003, r));
+    },
+    /* risa malvada: "ja ja ja" con formantes de la vocal a */
+    laugh() {
+      if (!ctx()) return; const t0 = a.currentTime, out = bus(.5);
+      [0, .2, .4, .6, .83].forEach((d, i) => {
+        const t = t0 + d, o = a.createOscillator(), g = a.createGain(), f1 = a.createBiquadFilter(), f2 = a.createBiquadFilter(), n = noise(.05), ng = a.createGain(), nf = a.createBiquadFilter();
+        o.type = 'sawtooth'; o.frequency.setValueAtTime(165 - i * 14, t); o.frequency.exponentialRampToValueAtTime(118 - i * 12, t + .17);
+        f1.type = 'bandpass'; f1.frequency.value = 780; f1.Q.value = 5; f2.type = 'bandpass'; f2.frequency.value = 1180; f2.Q.value = 6;
+        env(g.gain, t + .03, 2.2, .015, .15); o.connect(f1); o.connect(f2); f1.connect(g); f2.connect(g); g.connect(out);
+        nf.type = 'highpass'; nf.frequency.value = 1800; env(ng.gain, t, .25, .005, .04); n.connect(nf); nf.connect(ng); ng.connect(out);
+        o.start(t); o.stop(t + .25); n.start(t);
+      });
+    },
+    /* golpe sordo */
+    thud() {
+      if (!ctx()) return; const t = a.currentTime, out = bus(.35), o = tone('sine', 95, t, out, .9, .005, .5);
+      o.frequency.exponentialRampToValueAtTime(38, t + .45);
+    },
+    /* aviso de algo nuevo en vivo */
+    notify() { api.bell(784); setTimeout(() => api.bell(1046.5), 160); },
+    /* ambiente: zumbido grave + viento */
+    drone(on) {
+      if (!on) {
+        if (drn && a) { const n = drn; drn = null; n.g.gain.setTargetAtTime(.0001, a.currentTime, .35); setTimeout(n.stop, 1800); }
+        return;
+      }
+      if (!ctx() || drn) return;
+      const t = a.currentTime, g = a.createGain(), lp = a.createBiquadFilter();
+      g.gain.setValueAtTime(.0001, t); g.gain.exponentialRampToValueAtTime(.11, t + 2.5); g.connect(master);
+      const w = a.createGain(); w.gain.value = .6; g.connect(w); w.connect(verb);
+      lp.type = 'lowpass'; lp.frequency.value = 230; lp.connect(g);
+      const o1 = a.createOscillator(), o2 = a.createOscillator(), o3 = a.createOscillator();
+      o1.type = o2.type = 'sawtooth'; o3.type = 'triangle'; o1.frequency.value = 55; o2.frequency.value = 55.7; o3.frequency.value = 82.4;
+      const o3g = a.createGain(); o3g.gain.value = .35; o3.connect(o3g); o3g.connect(lp); o1.connect(lp); o2.connect(lp);
+      const n = noise(4); n.loop = true;
+      const bp = a.createBiquadFilter(); bp.type = 'bandpass'; bp.Q.value = 1.4; bp.frequency.value = 520;
+      const ng = a.createGain(); ng.gain.value = .45; n.connect(bp); bp.connect(ng); ng.connect(g);
+      const lfo = a.createOscillator(), lg = a.createGain(); lfo.frequency.value = .07; lg.gain.value = 320; lfo.connect(lg); lg.connect(bp.frequency);
+      [o1, o2, o3, n, lfo].forEach(x => x.start(t));
+      drn = { g, stop: () => [o1, o2, o3, n, lfo].forEach(x => { try { x.stop(); } catch (e) {} }) };
+    },
+    pause(p) { if (!a) return; try { p ? a.suspend() : a.resume(); } catch (e) {} }
+  };
+  return api;
+})();
+const play = k => { if (S.sound) Snd[k](); };
+function boo() { if (S.sound) { Snd.knock(); setTimeout(() => Snd.laugh(), 260); } }
+const BAT = '<svg viewBox="0 0 64 28" aria-hidden="true"><path fill="currentColor" d="M32 9c-1.5-4-5-4-5.5 0C20 3 10 3 1 11c7-1 11 2 13 7 2-3 6-3 8 0 2-2 4-3 6-2l4 6 4-6c2-1 4 0 6 2 2-3 6-3 8 0 2-5 6-8 13-7-9-8-19-8-25.5-2-.5-4-4-4-5.5 0z"/></svg>';
+function bats() {
+  if (reduced) return;
+  const layer = $('#bats');
+  for (let i = 0; i < 6; i++) {
+    const b = document.createElement('div'); b.className = 'bat'; b.innerHTML = BAT;
+    b.style.top = (12 + Math.random() * 55) + '%'; b.style.width = (34 + Math.random() * 30) + 'px';
+    b.style.animationDelay = (i * .11) + 's'; b.style.setProperty('--dy', (Math.random() * 160 - 80) + 'px');
+    layer.appendChild(b); setTimeout(() => b.remove(), 2600);
+  }
+}
+function toggleSound() {
+  S.sound = !S.sound; $('#b-sound').setAttribute('aria-pressed', String(S.sound));
+  try { localStorage.setItem('buu-sound', S.sound ? '1' : '0'); } catch (e) {}
+  if (S.sound) { Snd.bell(); toast('Sonido encendido.'); } else toast('Sonido apagado.');
+}
+
+/* ---------- exportar ---------- */
+$('#b-csv').addEventListener('click', async () => {
+  if (!S.guests.length) return toast('Todavía no hay invitados para exportar.');
+  const cols = ['Nombre', 'Instagram', 'Comprobante', 'Teléfono o contacto', 'Correo', 'Disfraz', 'Tipo', 'Estado', 'Monto', 'Pago', 'Cómo pagó', 'Código', 'Solicitud', 'Entró', 'Hora de entrada', 'Registrado', 'Registró', 'Aprobó', 'Notas'];
+  const q = v => '"' + String(v ?? '').replace(/"/g, '""') + '"';
+  const rows = S.guests.slice().sort((a, b) => (a.creadoEn || 0) - (b.creadoEn || 0)).map(g => [g.nombre, g.instagram ? '@' + g.instagram : '', g.comprobante ? 'Recibido' : '', g.contacto, g.correo, g.disfraz, TIPO[g.tipo] || g.tipo, ESTADO[est(g)], g.monto, g.pago, g.metodo, g.codigo, g.solicitud, g.entro ? 'Sí' : 'No', tm(g.entroEn), g.creadoEn ? dm(g.creadoEn) + ' ' + tm(g.creadoEn) : '', orgName(g.creadoPor), g.aprobadoPor ? orgName(g.aprobadoPor) : '', g.notas].map(q).join(','));
+  const csv = '﻿' + [cols.map(q).join(','), ...rows].join('\r\n');
+  saveFile('buullakeo-invitados.csv', new Blob([csv], { type: 'text/csv' }), 'CSV descargado.');
+});
+$('#b-mails').addEventListener('click', async () => {
+  const mails = [...new Set(S.guests.filter(g => est(g) !== 'rechazado').map(g => (g.correo || '').trim()).filter(Boolean))];
+  if (!mails.length) return toast('Nadie ha dejado correo todavía.');
+  copyText(mails.join(', '), `${mails.length} correos copiados.`);
+});
+
+/* ---------- modales y acciones ---------- */
+let lastFocus = null;
+function openModal(m) { lastFocus = document.activeElement; $$('.modal').forEach(x => x.hidden = true); m.hidden = false; const f = m.querySelector('.x'); if (f) f.focus(); }
+function closeModals() { $$('.modal').forEach(x => x.hidden = true); if (lastFocus && lastFocus.focus && document.contains(lastFocus)) lastFocus.focus(); }
+$$('.modal').forEach(m => m.addEventListener('click', e => { if (e.target === m) closeModals(); }));
+addEventListener('keydown', e => { if (e.key === 'Escape') closeModals(); });
+document.addEventListener('click', e => {
+  const b = e.target.closest('[data-act]'); if (!b) return;
+  const id = b.dataset.id;
+  switch (b.dataset.act) {
+    case 'checkin': checkin(id); break;
+    case 'undo': undoIn(id); break;
+    case 'comp': {
+      const g = byId(id); if (!g || busy.has(id)) break;
+      busy.add(id); b.disabled = true;
+      api('comprobante', { id, valor: !g.comprobante }).then(r => { busy.delete(id); b.disabled = false; if (r.ok) { play('bell'); toast(r.g && r.g.comprobante ? `Comprobante de ${g.nombre} recibido.` : `Quitaste el comprobante de ${g.nombre}.`); } });
+      break;
+    }
+    case 'approve': openApprove(id); break;
+    case 'reject': reject(b, id); break;
+    case 'restore': api('restaurar', { id }).then(r => r.ok && toast('Regresó a por aprobar.')); break;
+    case 'ticket': { const g = byId(id); if (g) showTicket(g); break; }
+    case 'edit': openEdit(id); break;
+    case 'filter': S.filter = b.dataset.f; renderList(); break;
+    case 'close': closeModals(); break;
+    case 'demo': startDemo(); break;
+    case 'exit-demo': exitDemo(); break;
+    case 'sound': toggleSound(); break;
+    case 'lock': if (S.mode === 'demo') { exitDemo(); } else { lock(''); toast('Taquilla bloqueada en este celular.'); } break;
+    case 'peek': { const i = document.getElementById(b.dataset.for); if (i) { const show = i.type === 'password'; i.type = show ? 'text' : 'password'; b.textContent = show ? 'Ocultar' : 'Mostrar'; } break; }
+    case 'reset-open': S.resetOpen = b.dataset.u; renderAccounts(); setTimeout(() => { const i = $('#r-pass'); if (i) i.focus(); }, 20); break;
+    case 'reset-close': S.resetOpen = null; renderAccounts(); break;
+    case 'remove-user': removeUser(b, b.dataset.u); break;
+    case 'wipe': openWipe(); break;
+    case 'wipe-next': S.wipeStep = Math.min(3, S.wipeStep + 1); renderWipe(); break;
+    case 'wipe-go': wipeGo(); break;
+    case 'sync': refreshNow(true); break;
+    case 'sync-all': refreshNow(true); break;
+    case 'excel': exportExcel(); break;
+    case 'share-dl': shareDownload(b.dataset.kind); break;
+    case 'share-copy': { const t = document.getElementById(b.dataset.for); if (t) copyText(t.value, 'Texto copiado.', t); break; }
+    case 'copy-guest': copyText(shareLink(), 'Link copiado. Pégalo en tu historia o en la bio.'); break;
+  }
+});
+
+function countdown() {
+  const d = EVENT_AT - Date.now(); let txt;
+  if (d > 0) { const D = Math.floor(d / 864e5), h = Math.floor(d % 864e5 / 36e5), m = Math.floor(d % 36e5 / 6e4); txt = D > 0 ? `Faltan ${D} d ${h} h` : `Faltan ${h} h ${m} min`; }
+  else if (-d < 8 * 36e5) { const h = Math.floor(-d / 36e5), m = Math.floor(-d % 36e5 / 6e4); txt = `La fiesta lleva ${h} h ${m} min`; }
+  else txt = 'Sábado 24 de octubre';
+  $('#countdown').textContent = txt;
+}
+
+boot();
+})();
+</script>
+</body>
+</html>
