@@ -660,8 +660,9 @@ tr.flash td{animation:flashtd 2.4s ease-out}
             <div class="checks">
               <label class="check"><input type="checkbox" id="pg-abierto"> Recibir solicitudes nuevas</label>
               <label class="check"><input type="checkbox" id="pg-preventa"> Vender preventa</label>
+              <label class="check"><input type="checkbox" id="pg-igreq"> Pedir Instagram obligatorio</label>
             </div>
-            <span class="hint">Si apagas la preventa, solo se puede pedir lugar pagando en la puerta.</span>
+            <span class="hint">Si apagas la preventa, solo se puede pedir lugar pagando en la puerta. El Instagram del invitado es opcional, salvo que actives la tercera opción.</span>
           </div>
           <div class="field" id="pg-msg-f"><label for="pg-msg">Mensaje cuando ya no reciben solicitudes</label><input type="text" id="pg-msg" maxlength="200" placeholder="Ej. Ya se llenó. ¡Nos vemos en la próxima!"></div>
           <div class="field"><label for="pg-aviso">Aviso arriba de la página <span class="muted">(opcional)</span></label><input type="text" id="pg-aviso" maxlength="200" placeholder="Ej. ¡Quedan 20 preventas!"></div>
@@ -846,7 +847,7 @@ tr.flash td{animation:flashtd 2.4s ease-out}
 const TZ = 'America/Mexico_City';
 const EVENT_AT = Date.parse('2026-10-24T19:30:00-06:00');
 const MAPS_URL = 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent('Calle San Pedro 817 Lt. 25');
-const PAG_DEF = { perfiles: [{ u: 'alejandro.elfavoo', t: 'Dudas, cambios o lo que sea de la fiesta' }], incluye: ['DJ en vivo', 'Rifa de botella al mejor disfraz', 'Venta de alcohol en el lugar'], aviso: '', transferencia: '', cerrado: false, sinPreventa: false, mensajeCerrado: '' };
+const PAG_DEF = { perfiles: [{ u: 'alejandro.elfavoo', t: 'Dudas, cambios o lo que sea de la fiesta' }, { u: 'tapiaandrea._', t: 'Pagos y comprobantes' }], incluye: ['DJ en vivo', 'Rifa de botella al mejor disfraz', 'Venta de alcohol en el lugar'], aviso: '', transferencia: '', cerrado: false, sinPreventa: false, mensajeCerrado: '' };
 const DEFAULTS = { precioPreventa: 70, precioPuerta: 100, meta: null, cupo: null, direccion: 'Calle San Pedro 817 Lt. 25', mapa: MAPS_URL, ig: 'alejandro.elfavoo', igPagos: 'tapiaandrea._', pagina: PAG_DEF };
 const pag = () => Object.assign({}, PAG_DEF, (S.config && S.config.pagina) || {});
 const incluye = () => { const l = (pag().incluye || []).filter(Boolean); return l.length ? l : PAG_DEF.incluye; };
@@ -1894,12 +1895,12 @@ function fillPagina(force) {
   if (!force && S.pgDirty) return;
   const p = pag();
   $('#pg-old').hidden = !(S.mode === 'live' && (S.version || 4) < 5);
-  $('#pg-abierto').checked = p.cerrado !== true; $('#pg-preventa').checked = p.sinPreventa !== true;
+  $('#pg-abierto').checked = p.cerrado !== true; $('#pg-preventa').checked = p.sinPreventa !== true; $('#pg-igreq').checked = p.igObligatorio === true;
   $('#pg-msg').value = p.mensajeCerrado || ''; $('#pg-aviso').value = p.aviso || '';
   $('#pg-xfer').value = p.transferencia || ''; $('#pg-incluye').value = incluye().join('\n');
   const box = $('#pg-perfiles'); box.innerHTML = '';
   const perf = (p.perfiles || []).filter(x => x && x.u);
-  (perf.length ? perf : [{ u: S.config.ig || 'alejandro.elfavoo', t: PAG_DEF.perfiles[0].t }]).forEach(x => box.appendChild(perfilRow(x.u, x.t)));
+  (perf.length ? perf : PAG_DEF.perfiles).forEach(x => box.appendChild(perfilRow(x.u, x.t)));
   syncPgUi();
   const st = $('#sol-state');
   if (st) {
@@ -1924,7 +1925,7 @@ $('#f-pagina').addEventListener('submit', async e => {
   const pagina = {
     perfiles, aviso: $('#pg-aviso').value.trim(), transferencia: $('#pg-xfer').value.trim(),
     incluye: $('#pg-incluye').value.split('\n').map(x => x.trim()).filter(Boolean).slice(0, 8),
-    cerrado: !$('#pg-abierto').checked, sinPreventa: !$('#pg-preventa').checked, mensajeCerrado: $('#pg-msg').value.trim()
+    cerrado: !$('#pg-abierto').checked, sinPreventa: !$('#pg-preventa').checked, igObligatorio: $('#pg-igreq').checked, mensajeCerrado: $('#pg-msg').value.trim()
   };
   if (S.mode === 'live' && (S.version || 4) < 5) { err.textContent = 'Falta actualizar el servidor de Google a la versión 5 para guardar esto.'; err.hidden = false; return; }
   const btn = $('#pg-save'); btn.disabled = true;

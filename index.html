@@ -340,19 +340,13 @@ textarea{width:100%;min-height:136px;margin-top:8px;background:var(--night);bord
   <section class="panel" id="v-form" aria-labelledby="f-title">
     <div>
       <h2 id="f-title">Confirma tu asistencia</h2>
-      <p class="lede">Solo tu nombre y tu Instagram. Mandas tu solicitud, la aprobamos y aquí mismo te sale tu boleto.</p>
+      <p class="lede">Con tu nombre basta. Mandas tu solicitud, la aprobamos y te llega tu boleto.</p>
     </div>
     <form id="f" novalidate>
       <div class="field">
         <label for="g-nombre">Tu nombre</label>
         <input type="text" id="g-nombre" autocomplete="name" autocapitalize="words" enterkeyhint="done" placeholder="Nombre y apellido" aria-describedby="g-nombre-err">
         <p class="err" id="g-nombre-err" hidden></p>
-      </div>
-      <div class="field">
-        <label for="g-ig">Tu usuario de Instagram <span class="req" aria-hidden="true">*</span></label>
-        <div class="ig-in"><span aria-hidden="true">@</span><input type="text" id="g-ig" autocomplete="off" autocapitalize="none" autocorrect="off" spellcheck="false" enterkeyhint="done" maxlength="60" placeholder="tuusuario" aria-describedby="g-ig-err g-ig-hint" aria-required="true"></div>
-        <p class="err" id="g-ig-err" hidden></p>
-        <p class="hint-s" id="g-ig-hint">Con él encontramos tu pago cuando mandes tu comprobante.</p>
       </div>
       <fieldset class="pick">
         <legend>¿Cómo vas a entrar?</legend>
@@ -362,8 +356,14 @@ textarea{width:100%;min-height:136px;margin-top:8px;background:var(--night);bord
         </div>
       </fieldset>
       <details class="more" id="more">
-        <summary>Agregar más datos (opcional)</summary>
+        <summary>Agregar tu Instagram y más datos (opcional)</summary>
         <div class="in">
+          <div class="field">
+            <label for="g-ig">Tu usuario de Instagram <span class="req" id="g-ig-req" aria-hidden="true" hidden>*</span></label>
+            <div class="ig-in"><span aria-hidden="true">@</span><input type="text" id="g-ig" autocomplete="off" autocapitalize="none" autocorrect="off" spellcheck="false" enterkeyhint="done" maxlength="60" placeholder="tuusuario" aria-describedby="g-ig-err g-ig-hint"></div>
+            <p class="err" id="g-ig-err" hidden></p>
+            <p class="hint-s" id="g-ig-hint">Nos ayuda a encontrar tu pago cuando mandes tu comprobante.</p>
+          </div>
           <div class="field"><label for="g-contacto">Teléfono o WhatsApp</label><input type="tel" id="g-contacto" autocomplete="tel" inputmode="tel" placeholder="55 1234 5678"><p class="hint-s">Por si necesitamos avisarte algo.</p></div>
           <div class="field"><label for="g-disfraz">¿De qué te vas a disfrazar?</label><input type="text" id="g-disfraz" autocomplete="off" placeholder="Ej. Catrina zombie, Chucky, la Llorona…"><p class="hint-s">Hay rifa de botella al mejor disfraz.</p></div>
           <div class="field">
@@ -508,10 +508,12 @@ const CFG = Object.assign({
   mapa: 'https://www.google.com/maps/search/?api=1&query=Calle%20San%20Pedro%20817%20Lt.%2025', ig: 'alejandro.elfavoo', igPagos: 'tapiaandrea._', link: '', url: ''
 }, mem.get('buu-cfg') || {});
 const HERE = location.origin + location.pathname.replace(/index\.html$/, '');
-const PAG_DEF = { perfiles: [{ u: 'alejandro.elfavoo', t: 'Dudas, cambios o lo que sea de la fiesta' }], incluye: ['DJ en vivo', 'Rifa de botella al mejor disfraz', 'Venta de alcohol en el lugar'], aviso: '', transferencia: '', cerrado: false, sinPreventa: false, mensajeCerrado: '' };
+const PAG_DEF = { perfiles: [{ u: 'alejandro.elfavoo', t: 'Dudas, cambios o lo que sea de la fiesta' }, { u: 'tapiaandrea._', t: 'Pagos y comprobantes' }], incluye: ['DJ en vivo', 'Rifa de botella al mejor disfraz', 'Venta de alcohol en el lugar'], aviso: '', transferencia: '', cerrado: false, sinPreventa: false, mensajeCerrado: '' };
 let PAG = Object.assign({}, PAG_DEF, (mem.get('buu-cfg') || {}).pagina || {});
 const IG_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><path d="M17.5 6.5h.01"/></svg>';
 const okIg = u => /^[a-z0-9._]{1,30}$/.test(String(u || ''));
+/* El servidor nuevo dice explícitamente si el Instagram es obligatorio; si no lo dice (servidor viejo), lo pedimos. */
+const igRequired = () => CFG.igObligatorio !== false;
 function applyPagina() {
   const perf = (Array.isArray(PAG.perfiles) ? PAG.perfiles : []).filter(x => x && okIg(x.u));
   const lista = perf.length ? perf : PAG_DEF.perfiles;
@@ -528,6 +530,10 @@ function applyPagina() {
   (inc.length ? inc : PAG_DEF.incluye).forEach(t => { const li = document.createElement('li'); li.textContent = t; ul.appendChild(li); });
   const av = $('#aviso'); av.textContent = PAG.aviso || ''; av.hidden = !PAG.aviso;
   $('#c-msg').textContent = PAG.mensajeCerrado || 'Gracias por el interés. Si tienes dudas, escríbenos por Instagram.';
+  const req = igRequired();
+  $('#g-ig-req').hidden = !req; $('#g-ig').setAttribute('aria-required', String(req));
+  $('#g-ig-hint').textContent = req ? 'Obligatorio: con él encontramos tu pago cuando mandes tu comprobante.' : 'Nos ayuda a encontrar tu pago cuando mandes tu comprobante.';
+  if (req && !$('#more').open) $('#more').open = true;
   const sinPre = PAG.sinPreventa === true, pre = $('#g-pre');
   pre.disabled = sinPre; pre.closest('.opt').classList.toggle('off', sinPre);
   if (sinPre && pre.checked) $('#g-door').checked = true;
@@ -611,8 +617,8 @@ function collect() {
   const nombre = cleanName($('#g-nombre').value);
   if (nombre.length < 2 || !/\p{L}/u.test(nombre)) { fieldErr('#g-nombre', 'Escribe tu nombre para saber quién eres en la puerta.'); return null; }
   const instagram = cleanIg($('#g-ig').value);
-  if (!instagram) { fieldErr('#g-ig', 'Escribe tu usuario de Instagram, sin la @.'); return null; }
-  if (!igOk(instagram)) { fieldErr('#g-ig', instagram.length > 30 ? 'Ese usuario es muy largo. En Instagram son máximo 30 caracteres.' : 'Solo letras, números, puntos y guiones bajos. Revisa que esté bien escrito.'); return null; }
+  if (!instagram && igRequired()) { $('#more').open = true; fieldErr('#g-ig', 'Escribe tu usuario de Instagram, sin la @.'); return null; }
+  if (instagram && !igOk(instagram)) { $('#more').open = true; fieldErr('#g-ig', instagram.length > 30 ? 'Ese usuario es muy largo. En Instagram son máximo 30 caracteres.' : 'Solo letras, números, puntos y guiones bajos. Revisa que esté bien escrito.'); return null; }
   $('#g-ig').value = instagram;
   const correo = $('#g-correo').value.trim();
   if (correo && !/^\S+@\S+\.\S+$/.test(correo)) { $('#more').open = true; fieldErr('#g-correo', 'A ese correo le falta la @ o el dominio. Si no quieres darlo, déjalo vacío.'); return null; }
@@ -690,7 +696,7 @@ async function submit() {
   } catch (e) {
     const c = errCode(e);
     if (c === 'NOMBRE') fieldErr('#g-nombre', 'Escribe tu nombre para saber quién eres en la puerta.');
-    else if (c === 'INSTAGRAM') fieldErr('#g-ig', 'Revisa tu usuario de Instagram: solo letras, números, puntos y guiones bajos.');
+    else if (c === 'INSTAGRAM') { $('#more').open = true; fieldErr('#g-ig', 'Revisa tu usuario de Instagram: solo letras, números, puntos y guiones bajos.'); }
     else if (c === 'CERRADO') { PAG.cerrado = true; applyPagina(); toast('Ya no estamos recibiendo solicitudes.'); }
     else if (c === 'PREVENTA_CERRADA') { PAG.sinPreventa = true; applyPagina(); toast('La preventa se agotó. Puedes pedir tu lugar pagando en la puerta.'); }
     else if (c === 'CORREO') { $('#more').open = true; fieldErr('#g-correo', 'Revisa el correo o déjalo vacío.'); }
